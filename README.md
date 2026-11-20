@@ -10,9 +10,8 @@ Appli (ce dossier)  ──POST {sessionId, message, history}──▶  n8n « My
                                                               ├─ Gemini choisit les biens et répond
 ◀── {reply, listings[], total, source} ───────────────────────┘
 ```
-- Le Google Sheet « Agent Immobilier IA – Base des biens Abidjan » reste privé : seul n8n le lit.
+- Le Google Sheet « les biens data base » reste privé : seul n8n le lit.
 - Seuls les biens `Disponibilité = Disponible` sont proposés. Les lignes dont le titre commence par « EXEMPLE » sont ignorées.
-- Le fichier « My Key AI – Biens DÉMO » ajoute 14 biens fictifs pour tester. **Supprimez-le avant le lancement** : les biens DÉMO disparaissent aussitôt.
 
 ## Lancer en local
 ```

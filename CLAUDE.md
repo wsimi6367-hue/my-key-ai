@@ -19,7 +19,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
   - Entrée : `{ sessionId, message, history: [{ role: "user"|"assistant", content }] }`.
   - Sortie : `{ reply, listings: Bien[], total, source: "live"|"error" }`.
   - Étapes : contrôle du message (limite 80 messages / session / jour, 3000 / jour au total) →
-    lecture du Sheet (compte Google de n8n, lecture seule) + fichier DÉMO → catalogue des biens Disponibles →
+    lecture du Sheet (compte Google de n8n, lecture seule) → catalogue des biens Disponibles →
     agent IA (Gemini, modèle `gemini-3-flash-preview`) qui renvoie `{ ids, reply }` → fiches complètes renvoyées à l'appli.
 - Un `Bien` renvoyé : `id, demo, transaction, type, titre, commune, zone, quartier, repere, prix, periodicite, conditions,
   surface, pieces, chambres, sdb, meuble, equipements, description, publie, contact{nom,typeAnnonceur,telephone,whatsapp,email},
@@ -38,7 +38,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - `js/icons.js` : icônes SVG et logo.
 
 ## La base Google Sheet
-Fichier : « Agent Immobilier IA – Base des biens Abidjan »
+Fichier : « les biens data base » (anciennement « Agent Immobilier IA – Base des biens Abidjan »)
 ID : `10gUFQ44l1SUuitSkhM0uYSMCtsmrJbXk7lHITNVbqAY`. Onglets : Guide, Tableau de bord, Biens, Quartiers, Listes, Recherche.
 
 Onglet `Biens`, une ligne par bien, en-têtes exacts (ligne 1) :
@@ -54,7 +54,7 @@ Dernière vérification · Notes
 Ne proposer au client que les lignes `Disponibilité = Disponible`.
 
 ## Prochaines étapes proposées
-1. Supprimer le fichier « My Key AI – Biens DÉMO » et remplir le Sheet avec de vraies annonces avant le lancement.
+1. Remplir le Sheet avec de vraies annonces (le fichier de biens DÉMO a été supprimé le 20/11/2026).
 2. **Canal WhatsApp** : WhatsApp Business Cloud API dans n8n, branché sur le même workflow.
 3. Script Apps Script dans le Sheet pour remplir automatiquement ID et date d'enregistrement.
 4. Recherche par photo (bouton appareil photo) : non implémentée, affiche un message.
