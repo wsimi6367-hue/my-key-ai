@@ -32,7 +32,7 @@ a { color: inherit; }
   .results { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .msg { max-width: 72%; }
   .hero h1 { font-size: 32px; }
-  .logo svg { max-width: 300px; }
+  .logo img { max-width: 300px; }
   .drawer { width: 320px; }
   .sheet { left: 50%; right: auto; width: 560px; transform: translate(-50%, 105%); }
   .sheet.show { transform: translate(-50%, 0); }
@@ -67,9 +67,9 @@ a { color: inherit; }
 
 /* Logo */
 .logo { display: flex; flex-direction: column; align-items: center; margin: 10px 0 4px; }
-.logo svg { width: 78%; max-width: 280px; height: auto; }
+.logo img { width: 78%; max-width: 280px; height: auto; }
 .logo .word { font-family: var(--logo-font); font-weight: 900; font-size: 30px; color: var(--green); letter-spacing: .5px; margin-top: 2px; }
-.logo.small svg { max-width: 190px; }
+.logo.small img { max-width: 190px; }
 .logo.small .word { font-size: 24px; }
 
 /* Écran recherche */

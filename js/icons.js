@@ -23,21 +23,6 @@ export const ICONS = {
   download: s('<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'),
 };
 
-// Logo My Key AI : boucles calligraphiques entrelacées (dessin original).
-let logoN = 0;
-export const logoSwirl = () => {
-  const id = "mkg" + ++logoN;
-  return `
-<svg viewBox="0 0 330 100" fill="none" aria-hidden="true">
-  <defs>
-    <linearGradient id="${id}" x1="0" x2="1">
-      <stop offset="0" stop-color="#2fbf3a"/><stop offset=".5" stop-color="#9dff86"/><stop offset="1" stop-color="#2fbf3a"/>
-    </linearGradient>
-  </defs>
-  <g stroke="url(#${id})" stroke-linecap="round"><path d="M10 84 C 48 84, 114 14, 92 12 C 72 10, 60 56, 126 80 C 128 84, 194 14, 172 12 C 152 10, 140 56, 206 80 C 208 84, 274 14, 252 12 C 232 10, 220 56, 286 80 S 306 60, 316 54" stroke-width="3.4" opacity="1"/><path d="M15 87 C 53 87, 119 17, 97 15 C 77 13, 65 59, 131 83 C 133 87, 199 17, 177 15 C 157 13, 145 59, 211 83 C 213 87, 279 17, 257 15 C 237 13, 225 59, 291 83 S 311 63, 321 57" stroke-width="1.4" opacity="0.7"/><path d="M6 88 C 44 88, 110 18, 88 16 C 68 14, 56 60, 122 84 C 124 88, 190 18, 168 16 C 148 14, 136 60, 202 84 C 204 88, 270 18, 248 16 C 228 14, 216 60, 282 84 S 302 64, 312 58" stroke-width="1" opacity="0.45"/></g>
-</svg>`;
-};
-
 export const TYPE_ICON = {
   Terrain: ICONS.land,
   default: ICONS.home,

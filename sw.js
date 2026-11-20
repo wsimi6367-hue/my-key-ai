@@ -1,10 +1,10 @@
 // Service worker de My Key AI : garde l'appli disponible (coquille hors ligne).
 // Le chat IA (requêtes POST vers n8n) n'est jamais mis en cache.
-const CACHE = "mykeyai-v1";
+const CACHE = "mykeyai-v2";
 const SHELL = [
   "./", "index.html", "manifest.webmanifest", "css/styles.css",
   "js/app.js", "js/api.js", "js/config.js", "js/geo.js", "js/icons.js", "js/search.js",
-  "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png",
+  "img/logo.png", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png",
 ];
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));

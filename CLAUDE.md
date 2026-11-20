@@ -35,7 +35,8 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - `js/app.js` : interface, navigation, chat, fiches de biens, choix du lieu, vocal, installation.
 - `js/geo.js` : référentiel Commune > Zone > Quartier (14 communes du District d'Abidjan). Doit rester identique à l'onglet « Quartiers » du Sheet.
 - `js/search.js` : liste des lieux pour le sélecteur (`PLACES`, `norm`). Ses fonctions de recherche par règles ne sont plus utilisées par l'interface.
-- `js/icons.js` : icônes SVG et logo.
+- `js/icons.js` : icônes SVG.
+- `img/logo.png` : logo (maison + signature verte, fond transparent), affiché au-dessus du mot « my key ai ».
 
 ## La base Google Sheet
 Fichier : « les biens data base » (anciennement « Agent Immobilier IA – Base des biens Abidjan »)

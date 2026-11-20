@@ -1,6 +1,6 @@
 import { CONFIG } from "./config.js";
 import { GEO } from "./geo.js";
-import { ICONS, logoSwirl, TYPE_ICON } from "./icons.js";
+import { ICONS, TYPE_ICON } from "./icons.js";
 import { PLACES, norm } from "./search.js";
 import { askAssistant, newSessionId } from "./api.js";
 
@@ -28,7 +28,7 @@ const persist = () => store.write({ sessionId: state.sessionId, messages: state.
 /* ---------- Mise en place ---------- */
 function paintIcons(root = document) {
   $$("[data-icon]", root).forEach((el) => { el.innerHTML = ICONS[el.dataset.icon] || ""; });
-  $$("[data-logo]", root).forEach((el) => { el.innerHTML = logoSwirl() + '<div class="word">my key ai</div>'; });
+  $$("[data-logo]", root).forEach((el) => { el.innerHTML = '<img src="img/logo.png" alt="" width="690" height="240" decoding="async"><div class="word">my key ai</div>'; });
 }
 
 const TYPES = ["Terrain", "Studio", "Villa", "Duplex", "Appartement", "Maison", "Chambre", "Bureau"];
