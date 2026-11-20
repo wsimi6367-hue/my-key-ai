@@ -56,15 +56,6 @@ a { color: inherit; }
 .segmented button { padding: 9px 22px; border-radius: 999px; color: #cfcfcf; font-weight: 600; }
 .segmented button.on { background: var(--green); color: #061006; }
 
-.assistant-pill {
-  display: flex; align-items: center; gap: 10px; padding: 6px 16px 6px 6px; border-radius: 999px;
-  background: var(--surface-2); border: 1px solid var(--border);
-}
-.assistant-pill .star { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center;
-  background: radial-gradient(circle at 35% 30%, #8dff7a, var(--green-2)); color: #052005; }
-.assistant-pill strong { display: block; font-size: 15px; }
-.assistant-pill small { color: var(--muted); font-size: 11px; }
-
 /* Logo */
 .logo { display: flex; flex-direction: column; align-items: center; margin: 10px 0 4px; }
 .logo img { width: 78%; max-width: 280px; height: auto; }
