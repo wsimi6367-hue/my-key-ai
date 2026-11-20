@@ -1,13 +1,11 @@
 // Configuration de My Key AI.
 export const CONFIG = {
   appName: "My Key AI",
-  // ID du Google Sheet « Agent Immobilier IA – Base des biens Abidjan »
-  sheetId: "10gUFQ44l1SUuitSkhM0uYSMCtsmrJbXk7lHITNVbqAY",
-  sheetTab: "Biens",
-  // Lecture directe du Sheet (le Sheet doit être partagé « Tous les utilisateurs disposant du lien »).
-  // En production, passer plutôt par une API (voir CLAUDE.md) pour ne pas exposer les contacts.
-  useLiveSheet: true,
+  // Adresse du chat IA (workflow n8n « My Key AI – Chat »).
+  // Le workflow lit le Google Sheet « Agent Immobilier IA – Base des biens Abidjan » de façon privée
+  // et fait répondre Gemini. Le Sheet n'a pas besoin d'être public.
+  chatUrl: "https://appn8ncloud81.app.n8n.cloud/webhook/mykey-chat",
+  chatTimeoutMs: 60000,
   currency: "FCFA",
-  maxResults: 6,
   speechLang: "fr-FR",
 };

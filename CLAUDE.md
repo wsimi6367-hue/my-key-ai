@@ -10,25 +10,32 @@ Ce n'est pas un logiciel de gestion immobilière. Des agents humains remplissent
 
 Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 
-## État actuel (prototype)
-- `index.html` + `css/styles.css` + `js/*.js` : application web mobile, sans framework ni build.
+## État actuel
+- `index.html` + `css/styles.css` + `js/*.js` : application web (PWA installable), sans framework ni build.
   Lancer avec un serveur statique : `python3 -m http.server 8000`, puis ouvrir http://localhost:8000.
-- 3 écrans (maquettes fournies par le client), routés par le hash :
-  - `#recherche` : formulaire (Acheter/Louer, choix commune > zone > quartier, types, description, bouton).
-  - `#assistant` : chat avec suggestions, saisie, bouton + (vers recherche), photo, micro.
-  - `#vocal` : reconnaissance vocale (Web Speech API, fr-FR), onde animée, bascule vers le chat.
-- Bouton haut-parleur : lit les réponses à voix haute (speechSynthesis).
-- La « compréhension » des demandes est faite par des règles (`js/search.js`), pas encore par un LLM.
-- Données : `js/data.js` lit le Google Sheet en CSV (endpoint gviz) si le Sheet est public,
-  sinon bascule sur 14 biens fictifs de démonstration.
+- 3 écrans, routés par le hash : `#assistant` (chat), `#recherche` (formulaire), `#vocal` (Web Speech API, fr-FR).
+- Le chat et la recherche passent par le workflow n8n **« My Key AI – Chat »** (id `iUXATrfSv4ckMzan`),
+  webhook `POST https://appn8ncloud81.app.n8n.cloud/webhook/mykey-chat`.
+  - Entrée : `{ sessionId, message, history: [{ role: "user"|"assistant", content }] }`.
+  - Sortie : `{ reply, listings: Bien[], total, source: "live"|"error" }`.
+  - Étapes : contrôle du message (limite 80 messages / session / jour, 3000 / jour au total) →
+    lecture du Sheet (compte Google de n8n, lecture seule) + fichier DÉMO → catalogue des biens Disponibles →
+    agent IA (Gemini, modèle `gemini-3-flash-preview`) qui renvoie `{ ids, reply }` → fiches complètes renvoyées à l'appli.
+- Un `Bien` renvoyé : `id, demo, transaction, type, titre, commune, zone, quartier, repere, prix, periodicite, conditions,
+  surface, pieces, chambres, sdb, meuble, equipements, description, publie, contact{nom,typeAnnonceur,telephone,whatsapp,email},
+  plateforme, url, image, autresImages`.
+- Mémoire : la conversation et le `sessionId` sont gardés dans `localStorage` (l'appli fonctionne aussi sans).
+- PWA : `manifest.webmanifest`, `sw.js` (coquille en cache, réseau d'abord, le chat n'est jamais mis en cache),
+  icônes dans `icons/`. Bouton « Installer l'application » dans le menu (aide pas à pas sur iPhone).
+- Lecture à voix haute des réponses (speechSynthesis).
 
 ## Fichiers
-- `js/config.js` : ID du Sheet, onglet, options.
+- `js/config.js` : adresse du chat n8n, délai, langue.
+- `js/api.js` : appel au chat et messages d'erreur.
+- `js/app.js` : interface, navigation, chat, fiches de biens, choix du lieu, vocal, installation.
 - `js/geo.js` : référentiel Commune > Zone > Quartier (14 communes du District d'Abidjan). Doit rester identique à l'onglet « Quartiers » du Sheet.
-- `js/data.js` : chargement des biens (Sheet ou démo), normalisation des champs.
-- `js/search.js` : `parseQuery(texte)` -> critères ; `searchListings(biens, critères)` -> résultats (avec élargissement progressif : quartier -> zone -> commune, budget +15 %) ; textes de réponse.
-- `js/app.js` : interface, navigation, chat, choix du lieu, vocal.
-- `js/icons.js` : icônes SVG et logo (boucles vertes).
+- `js/search.js` : liste des lieux pour le sélecteur (`PLACES`, `norm`). Ses fonctions de recherche par règles ne sont plus utilisées par l'interface.
+- `js/icons.js` : icônes SVG et logo.
 
 ## La base Google Sheet
 Fichier : « Agent Immobilier IA – Base des biens Abidjan »
@@ -47,19 +54,11 @@ Dernière vérification · Notes
 Ne proposer au client que les lignes `Disponibilité = Disponible`.
 
 ## Prochaines étapes proposées
-1. **API serveur** (Node/Express, ou fonction serverless) qui lit le Sheet avec un compte de service
-   Google (API Sheets, lecture seule) et met les biens en cache quelques minutes. Ne pas rendre le Sheet
-   public en production : il contient les numéros des annonceurs.
-2. **Vrai LLM** : endpoint `/api/chat` qui appelle l'API Claude avec un outil `search_properties`
-   (paramètres : transaction, types, commune, zone, quartier, budget_max, chambres_min, meuble).
-   Le modèle extrait les critères, l'outil appelle `searchListings`, le modèle rédige la réponse en français.
-   Garder `parseQuery` comme repli si l'API est indisponible.
-3. **Canal WhatsApp** (probablement le canal principal à Abidjan) : WhatsApp Business Cloud API ou n8n,
-   branché sur le même `/api/chat`.
-4. **Application mobile** : soit PWA (manifest + service worker), soit encapsulation Capacitor,
-   soit portage React Native/Expo en gardant `search.js` et `geo.js`.
-5. Script Apps Script dans le Sheet pour remplir automatiquement ID et date d'enregistrement.
-6. Recherche par photo (bouton appareil photo) : non implémentée, affiche un message.
+1. Supprimer le fichier « My Key AI – Biens DÉMO » et remplir le Sheet avec de vraies annonces avant le lancement.
+2. **Canal WhatsApp** : WhatsApp Business Cloud API dans n8n, branché sur le même workflow.
+3. Script Apps Script dans le Sheet pour remplir automatiquement ID et date d'enregistrement.
+4. Recherche par photo (bouton appareil photo) : non implémentée, affiche un message.
+5. Si la base dépasse quelques centaines de biens : pré-filtrer (commune, type, budget) avant d'envoyer le catalogue à l'IA.
 
 ## Conventions
 - Interface en français, tutoiement interdit (vouvoiement).

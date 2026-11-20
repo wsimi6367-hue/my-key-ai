@@ -24,9 +24,19 @@ a { color: inherit; }
   background: var(--bg);
   padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
 }
-@media (min-width: 600px) {
-  body { display: grid; place-items: center; background: #0d0d0d; }
-  .app { height: min(900px, 96dvh); border-radius: 44px; border: 10px solid #1a1a1a; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+/* Tablette et ordinateur : une colonne centrée plus large, sans cadre de téléphone */
+@media (min-width: 760px) {
+  body { background: #0b0b0b; }
+  .app { max-width: 860px; border-left: 1px solid #161616; border-right: 1px solid #161616; }
+  .screen { padding: 18px 32px 24px; }
+  .results { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .msg { max-width: 72%; }
+  .hero h1 { font-size: 32px; }
+  .logo svg { max-width: 300px; }
+  .drawer { width: 320px; }
+  .sheet { left: 50%; right: auto; width: 560px; transform: translate(-50%, 105%); }
+  .sheet.show { transform: translate(-50%, 0); }
+  .chip-rows .chips { flex-wrap: wrap; justify-content: center; }
 }
 
 .screen { position: absolute; inset: 0; display: none; flex-direction: column; padding: 14px 18px 18px; }
@@ -193,3 +203,24 @@ a { color: inherit; }
 .drawer .meta { margin-top: auto; font-size: 12px; color: var(--muted); line-height: 1.5; }
 .drawer svg { width: 20px; height: 20px; }
 .hidden { display: none !important; }
+
+/* Ajouts : chat IA, installation */
+.listing .media > svg { position: absolute; }
+.listing .media img { position: absolute; inset: 0; }
+.listing .tag.demo { left: auto; right: 10px; color: #ffb4a8; }
+.listing .cond { font-size: 12px; color: #b5b5b5; margin-top: 8px; }
+.listing .contact a { color: inherit; }
+.msg.error { border-color: #5a2a2a; }
+.msg .retry { display: inline-block; margin-left: 6px; padding: 4px 12px; border-radius: 999px; background: var(--green); color: #061006; font-weight: 600; font-size: 13px; }
+.secondary {
+  width: 100%; margin: 14px 0 6px; padding: 13px; border-radius: 16px; font-weight: 600;
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--green);
+}
+#search-results .msg { max-width: 100%; margin: 16px 0 12px; }
+.primary:disabled { opacity: .7; cursor: progress; }
+.composer.busy .mic-btn { opacity: .6; }
+.chip:disabled { opacity: .5; }
+.install-btn { padding: 14px 10px; border-radius: 12px; display: flex; gap: 12px; align-items: center; color: var(--green); text-align: left; }
+.install-btn:hover { background: var(--surface-2); }
+.steps { margin: 4px 0 6px; padding-left: 20px; line-height: 1.7; color: #dcdcdc; }
+:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }

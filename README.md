@@ -1,23 +1,30 @@
 # My Key AI
 
-Assistant IA pour trouver un bien à louer ou à acheter à Abidjan.
+Assistant IA pour trouver un bien à louer ou à acheter à Abidjan. Application web installable
+sur PC (Chrome, Edge) et sur téléphone (Android, iPhone).
 
-## Lancer le prototype
+## Comment ça marche
 ```
-cd my-key-ai
+Appli (ce dossier)  ──POST {sessionId, message, history}──▶  n8n « My Key AI – Chat »
+                                                              ├─ lit le Google Sheet des biens (privé)
+                                                              ├─ Gemini choisit les biens et répond
+◀── {reply, listings[], total, source} ───────────────────────┘
+```
+- Le Google Sheet « Agent Immobilier IA – Base des biens Abidjan » reste privé : seul n8n le lit.
+- Seuls les biens `Disponibilité = Disponible` sont proposés. Les lignes dont le titre commence par « EXEMPLE » sont ignorées.
+- Le fichier « My Key AI – Biens DÉMO » ajoute 14 biens fictifs pour tester. **Supprimez-le avant le lancement** : les biens DÉMO disparaissent aussitôt.
+
+## Lancer en local
+```
 python3 -m http.server 8000
 ```
-Puis ouvrir http://localhost:8000 (sur téléphone : même réseau Wi-Fi, http://<ip-de-l-ordinateur>:8000).
+Puis ouvrir http://localhost:8000.
+
+## Mettre en ligne
+N'importe quel hébergement statique en https (GitHub Pages, Netlify…). Le https est obligatoire
+pour l'installation et pour le micro.
 
 ## Les 3 écrans
-- `#assistant` : discuter avec l'assistant (écran d'accueil).
-- `#recherche` : recherche détaillée avec choix de la commune et du quartier.
+- `#assistant` : discuter avec l'assistant (écran d'accueil). La conversation est gardée sur l'appareil.
+- `#recherche` : recherche détaillée (Acheter/Louer, lieu, types, description), traitée aussi par l'IA.
 - `#vocal` : parler à l'assistant (Chrome ou Safari, micro autorisé).
-
-## Brancher le Google Sheet
-Pour un essai rapide : partager le Sheet en « Tous les utilisateurs disposant du lien : lecteur ».
-L'app lit alors l'onglet `Biens` en direct. Sinon, elle affiche des biens de démonstration.
-En production, passer par une API (voir CLAUDE.md).
-
-## Continuer avec Claude Code
-Ouvrir ce dossier dans Claude Code : le fichier `CLAUDE.md` décrit le projet, la base de données et les prochaines étapes.

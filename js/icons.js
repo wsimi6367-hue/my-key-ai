@@ -20,6 +20,7 @@ export const ICONS = {
   home: s('<path d="M3 11l9-7 9 7v9H3z"/><path d="M9 20v-6h6v6"/>'),
   land: s('<path d="M3 18l5-8 4 5 3-4 6 7z"/>'),
   send: s('<path d="M4 12l16-8-6 16-2-6z"/>'),
+  download: s('<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'),
 };
 
 // Logo My Key AI : boucles calligraphiques entrelacées (dessin original).
