@@ -443,7 +443,7 @@ window.addEventListener("hashchange", route);
   const end = () => sp.classList.add("done");
   sp.addEventListener("animationend", (e) => { if (e.target === sp) end(); });
   sp.addEventListener("click", end);
-  setTimeout(end, 4000);
+  setTimeout(end, 6000);
 })();
 paintIcons();
 renderTypeChips();
