@@ -28,7 +28,7 @@ const persist = () => store.write({ sessionId: state.sessionId, messages: state.
 /* ---------- Mise en place ---------- */
 function paintIcons(root = document) {
   $$("[data-icon]", root).forEach((el) => { el.innerHTML = ICONS[el.dataset.icon] || ""; });
-  $$("[data-logo]", root).forEach((el) => { el.innerHTML = '<img src="img/logo.png" alt="" width="690" height="240" decoding="async"><div class="word">my key ai</div>'; });
+  $$("[data-logo]", root).forEach((el) => { el.innerHTML = '<span class="logo-mark" aria-hidden="true"></span><div class="word">my key ai</div>'; });
 }
 
 const TYPES = ["Terrain", "Studio", "Villa", "Duplex", "Appartement", "Maison", "Chambre", "Bureau"];
@@ -359,6 +359,25 @@ function animateWave() {
   draw();
 }
 
+/* ---------- Thème clair / sombre ---------- */
+const THEME_KEY = "mykeyai.theme";
+function applyTheme(theme) {
+  const light = theme === "light";
+  if (light) document.documentElement.dataset.theme = "light"; else delete document.documentElement.dataset.theme;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = light ? "#ffffff" : "#050505";
+  const btn = $("#theme-btn");
+  if (btn) {
+    btn.querySelector("[data-icon]").innerHTML = light ? ICONS.moon : ICONS.sun;
+    btn.querySelector(".label").textContent = light ? "Mode sombre (fond noir)" : "Mode clair (fond blanc)";
+  }
+}
+function toggleTheme() {
+  const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+  try { localStorage.setItem(THEME_KEY, next); } catch {}
+  applyTheme(next);
+}
+
 /* ---------- Installation (PWA) ---------- */
 let installPrompt = null;
 const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
@@ -407,6 +426,7 @@ document.addEventListener("click", (e) => {
     case "send": $("#composer").requestSubmit(); break;
     case "voice-stop": stopListening(); break;
     case "install": install(); break;
+    case "theme": toggleTheme(); break;
     case "close-help": $("#install-help").classList.remove("show"); closeAll(); break;
     case "reset": resetConversation(); break;
   }
@@ -446,6 +466,7 @@ window.addEventListener("hashchange", route);
   setTimeout(end, 6000);
 })();
 paintIcons();
+applyTheme(document.documentElement.dataset.theme === "light" ? "light" : "dark");
 renderTypeChips();
 renderSuggestions();
 renderHistory();

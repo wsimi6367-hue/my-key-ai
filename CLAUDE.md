@@ -28,6 +28,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - PWA : `manifest.webmanifest`, `sw.js` (coquille en cache, réseau d'abord, le chat n'est jamais mis en cache),
   icônes dans `icons/`. Bouton « Installer l'application » dans le menu (aide pas à pas sur iPhone).
 - Lecture à voix haute des réponses (speechSynthesis).
+- Thème clair / sombre : bouton dans le menu, choix gardé dans `localStorage` (`mykeyai.theme`), attribut `data-theme="light"` sur `<html>` ; couleurs claires en fin de `css/styles.css`. Le logo est un masque CSS (`.logo-mark`) coloré par `--logo-color`.
 - Écran d'ouverture animé (`#splash` dans `index.html`, styles en fin de `css/styles.css`) : blanc + logo vert, puis vert #009a44 + logo blanc, slogan « Une solution en 1 clic ! », cercle de chargement qui tourne ; environ 4,5 s (minimum 4 s demandé), puis fondu vers l'appli (un clic le passe).
 
 ## Fichiers
@@ -37,7 +38,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - `js/geo.js` : référentiel Commune > Zone > Quartier (14 communes du District d'Abidjan). Doit rester identique à l'onglet « Quartiers » du Sheet.
 - `js/search.js` : liste des lieux pour le sélecteur (`PLACES`, `norm`). Ses fonctions de recherche par règles ne sont plus utilisées par l'interface.
 - `js/icons.js` : icônes SVG.
-- `img/logo.png` : logo (maison + signature verte, fond transparent), affiché au-dessus du mot « my key ai ».
+- `img/logo.png` : logo (maison + signature, fond transparent), utilisé comme masque CSS au-dessus du mot « my key ai » et dans l'écran d'ouverture.
 
 ## La base Google Sheet
 Fichier : « les biens data base » (anciennement « Agent Immobilier IA – Base des biens Abidjan »)

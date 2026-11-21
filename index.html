@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#050505">
   <meta name="description" content="My Key AI, l'assistant IA pour trouver un bien à louer ou à acheter à Abidjan.">
   <title>My Key AI</title>
+  <script>try { if (localStorage.getItem("mykeyai.theme") === "light") { document.documentElement.dataset.theme = "light"; document.querySelector('meta[name="theme-color"]').content = "#ffffff"; } } catch (e) {}</script>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -126,6 +127,7 @@
     <a href="#recherche" data-nav="recherche"><span data-icon="search"></span>Recherche détaillée</a>
     <a href="#vocal" data-nav="vocal"><span data-icon="mic"></span>Recherche vocale</a>
     <a href="#assistant" data-action="reset"><span data-icon="close"></span>Nouvelle conversation</a>
+    <button class="theme-btn" data-action="theme" id="theme-btn"><span data-icon="sun"></span><span class="label">Mode clair (fond blanc)</span></button>
     <button class="install-btn hidden" data-action="install"><span data-icon="download"></span>Installer l'application</button>
     <div class="meta">Les biens viennent de notre base d'annonces, vérifiées par nos agents à Abidjan. Contactez toujours l'annonceur avant de vous déplacer et ne versez jamais d'argent avant la visite.</div>
   </nav>
