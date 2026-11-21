@@ -15,10 +15,16 @@
   <meta name="apple-mobile-web-app-title" content="My Key AI">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+<!-- Écran d'ouverture animé (blanc puis vert), avant l'interface principale -->
+<div id="splash" role="status" aria-label="Chargement de My Key AI">
+  <div class="splash-logo"></div>
+  <p class="splash-tag">Une solution en 1 clic !</p>
+  <div class="splash-spin"></div>
+</div>
 <main class="app" id="app">
 
   <!-- Écran 1 : Recherche (formulaire) -->

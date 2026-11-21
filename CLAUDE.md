@@ -28,6 +28,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - PWA : `manifest.webmanifest`, `sw.js` (coquille en cache, réseau d'abord, le chat n'est jamais mis en cache),
   icônes dans `icons/`. Bouton « Installer l'application » dans le menu (aide pas à pas sur iPhone).
 - Lecture à voix haute des réponses (speechSynthesis).
+- Écran d'ouverture animé (`#splash` dans `index.html`, styles en fin de `css/styles.css`) : blanc + logo vert, puis vert #009a44 + logo blanc, slogan « Une solution en 1 clic ! », cercle de chargement qui tourne ; environ 3 s, puis fondu vers l'appli (un clic le passe).
 
 ## Fichiers
 - `js/config.js` : adresse du chat n8n, délai, langue.

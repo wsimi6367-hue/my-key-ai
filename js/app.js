@@ -436,6 +436,15 @@ $("#voice-fallback").addEventListener("submit", (e) => {
 window.addEventListener("hashchange", route);
 
 /* ---------- Démarrage ---------- */
+// L'écran d'ouverture s'anime en CSS ; on le retire du DOM à la fin (ou au clic pour passer).
+(() => {
+  const sp = document.getElementById("splash");
+  if (!sp) return;
+  const end = () => sp.classList.add("done");
+  sp.addEventListener("animationend", (e) => { if (e.target === sp) end(); });
+  sp.addEventListener("click", end);
+  setTimeout(end, 4000);
+})();
 paintIcons();
 renderTypeChips();
 renderSuggestions();
