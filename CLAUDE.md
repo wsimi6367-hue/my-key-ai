@@ -19,8 +19,9 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
   - Entrée : `{ sessionId, message, history: [{ role: "user"|"assistant", content }] }`.
   - Sortie : `{ reply, listings: Bien[], total, source: "live"|"error" }`.
   - Étapes : contrôle du message (limite 80 messages / session / jour, 3000 / jour au total) →
-    lecture du Sheet (compte Google de n8n, lecture seule) → catalogue des biens Disponibles →
-    agent IA (Gemini, modèle `gemini-3-flash-preview`) qui renvoie `{ ids, reply }` → fiches complètes renvoyées à l'appli.
+    lecture brute de l'onglet Biens via l'API Sheets (compte Google de n8n, lecture seule ; la ligne d'en-têtes est retrouvée où qu'elle soit) →
+    catalogue des biens Disponibles trié du plus récent au plus ancien (date de publication, sinon d'enregistrement, sinon position ; 400 max) →
+    agent IA (Gemini, modèle `gemini-3-flash-preview`) qui parcourt d'abord les annonces récentes puis remonte vers les plus anciennes, et renvoie `{ ids, reply }` → fiches complètes renvoyées à l'appli.
 - Un `Bien` renvoyé : `id, demo, transaction, type, titre, commune, zone, quartier, repere, prix, periodicite, conditions,
   surface, pieces, chambres, sdb, meuble, equipements, description, publie, contact{nom,typeAnnonceur,telephone,whatsapp,email},
   plateforme, url, image, autresImages`.
