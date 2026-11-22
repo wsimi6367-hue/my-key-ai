@@ -219,7 +219,7 @@ a { color: inherit; }
 
 /* Écran d'ouverture : blanc + logo vert, puis vert + logo blanc, puis fondu vers l'appli */
 #splash {
-  --s-green: #009a44; --s-white: #ffffff;
+  --s-green: #009a44; --s-bright: #00ff00; --s-white: #ffffff;
   position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center;
   justify-content: center; background: var(--s-white); color: var(--s-green);
   animation: splash-bg 4.5s ease-in-out forwards;
@@ -242,8 +242,8 @@ a { color: inherit; }
 #splash.done { display: none; }
 @keyframes splash-bg {
   0%, 38%  { background: var(--s-white); color: var(--s-green); opacity: 1; visibility: visible; }
-  50%, 84% { background: var(--s-green); color: var(--s-white); opacity: 1; visibility: visible; }
-  100%     { background: var(--s-green); color: var(--s-white); opacity: 0; visibility: hidden; }
+  50%, 84% { background: var(--s-bright); color: var(--s-white); opacity: 1; visibility: visible; }
+  100%     { background: var(--s-bright); color: var(--s-white); opacity: 0; visibility: hidden; }
 }
 @keyframes splash-logo-in { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: none; } }
 @keyframes splash-text-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
