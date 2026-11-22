@@ -37,7 +37,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
   - Règles de sécurité : `firestore.rules` (chacun ne lit et n'écrit que sa fiche).
   - L'appli envoie `profile: { prenom, commune }` au chat n8n ; l'IA cherche d'abord dans cette commune si la demande ne précise pas de lieu.
 - Thème clair / sombre : bouton dans le menu, choix gardé dans `localStorage` (`mykeyai.theme`), attribut `data-theme="light"` sur `<html>` ; couleurs claires en fin de `css/styles.css`. Le logo est un masque CSS (`.logo-mark`) coloré par `--logo-color`.
-- Écran d'ouverture animé (`#splash` dans `index.html`, styles en fin de `css/styles.css`) : blanc + logo vert, puis vert vif #00ff00 + logo blanc, slogan « Une solution en 1 clic ! », cercle de chargement qui tourne ; environ 4,5 s (minimum 4 s demandé), puis fondu vers l'appli (un clic le passe).
+- Écran d'ouverture animé (`#splash` dans `index.html`, styles en fin de `css/styles.css`) : vert vif #00ff00 + logo blanc, puis blanc + logo vert #009a44, slogan « Une solution en 1 clic ! », cercle de chargement qui tourne ; environ 4,5 s (minimum 4 s demandé), puis fondu vers l'appli (un clic le passe).
 
 ## Fichiers
 - `js/config.js` : adresse du chat n8n, délai, langue.
