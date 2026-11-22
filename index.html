@@ -120,9 +120,39 @@
     <button class="primary" data-action="close-help">J'ai compris</button>
   </div>
 
+  <!-- Compte : connexion / inscription -->
+  <div class="sheet account-sheet" id="account-sheet" role="dialog" aria-label="Mon compte">
+    <div class="grab"></div>
+    <div class="segmented tabs" role="tablist">
+      <button type="button" data-auth-tab="login" class="on" role="tab">Se connecter</button>
+      <button type="button" data-auth-tab="signup" role="tab">Créer un compte</button>
+    </div>
+    <form id="login-form" class="auth-form" novalidate>
+      <label>E-mail ou téléphone<input name="identifiant" autocomplete="username" inputmode="email" placeholder="exemple@mail.com ou 07 00 00 00 00" required></label>
+      <label>Mot de passe<input name="password" type="password" autocomplete="current-password" required></label>
+      <p class="auth-msg" role="alert"></p>
+      <button class="primary" type="submit">Se connecter</button>
+      <button class="link" type="button" data-action="forgot">Mot de passe oublié ?</button>
+    </form>
+    <form id="signup-form" class="auth-form hidden" novalidate>
+      <div class="row2">
+        <label>Prénom<input name="prenom" autocomplete="given-name" required></label>
+        <label>Nom<input name="nom" autocomplete="family-name" required></label>
+      </div>
+      <label>E-mail ou téléphone<input name="identifiant" autocomplete="username" inputmode="email" placeholder="exemple@mail.com ou 07 00 00 00 00" required></label>
+      <label>Commune où vous cherchez<select name="commune" id="signup-commune"><option value="">Je ne sais pas encore</option></select></label>
+      <label>Mot de passe (6 caractères minimum)<input name="password" type="password" autocomplete="new-password" minlength="6" required></label>
+      <label>Confirmez le mot de passe<input name="password2" type="password" autocomplete="new-password" minlength="6" required></label>
+      <p class="auth-msg" role="alert"></p>
+      <button class="primary" type="submit">Créer mon compte</button>
+      <p class="note">Vos informations restent privées et servent uniquement à votre compte My Key AI.</p>
+    </form>
+  </div>
+
   <!-- Menu -->
   <nav class="drawer" id="drawer" aria-label="Menu">
     <div class="logo small" data-logo></div>
+    <div class="account-box hidden" id="account-box"></div>
     <a href="#assistant" data-nav="assistant"><span data-icon="chat"></span>Assistant</a>
     <a href="#recherche" data-nav="recherche"><span data-icon="search"></span>Recherche détaillée</a>
     <a href="#vocal" data-nav="vocal"><span data-icon="mic"></span>Recherche vocale</a>

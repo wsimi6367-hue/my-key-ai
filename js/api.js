@@ -9,7 +9,7 @@ export function newSessionId() {
 
 function fail(userMessage) { const e = new Error(userMessage); e.userMessage = userMessage; return e; }
 
-export async function askAssistant({ sessionId, message, history }) {
+export async function askAssistant({ sessionId, message, history, profile }) {
   if (typeof navigator !== "undefined" && navigator.onLine === false) {
     throw fail("Vous semblez hors ligne. Vérifiez votre connexion internet puis réessayez.");
   }
@@ -20,7 +20,7 @@ export async function askAssistant({ sessionId, message, history }) {
     res = await fetch(CONFIG.chatUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId, message, history }),
+      body: JSON.stringify({ sessionId, message, history, ...(profile ? { profile } : {}) }),
       signal: ctrl.signal,
     });
   } catch (e) {

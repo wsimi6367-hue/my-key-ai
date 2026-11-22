@@ -29,6 +29,13 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - PWA : `manifest.webmanifest`, `sw.js` (coquille en cache, réseau d'abord, le chat n'est jamais mis en cache),
   icônes dans `icons/`. Bouton « Installer l'application » dans le menu (aide pas à pas sur iPhone).
 - Lecture à voix haute des réponses (speechSynthesis).
+- Comptes utilisateurs (facultatifs) : Firebase Authentication (e-mail ou téléphone + mot de passe) et Firestore.
+  - `js/firebase-config.js` : objet `firebaseConfig` du projet Firebase (si `null`, l'appli marche sans comptes et le bloc « Votre compte » est masqué).
+  - `js/auth.js` : inscription, connexion, déconnexion, mot de passe oublié (comptes e-mail), sauvegarde de la conversation.
+    Un numéro de téléphone est converti en adresse technique `225XXXXXXXXXX@tel.mykeyai.app`.
+  - Fiche Firestore `users/{uid}` : `prenom, nom, commune, identifiant, type ("email"|"tel"), chat (JSON des 30 derniers messages), createdAt, updatedAt`.
+  - Règles de sécurité : `firestore.rules` (chacun ne lit et n'écrit que sa fiche).
+  - L'appli envoie `profile: { prenom, commune }` au chat n8n ; l'IA cherche d'abord dans cette commune si la demande ne précise pas de lieu.
 - Thème clair / sombre : bouton dans le menu, choix gardé dans `localStorage` (`mykeyai.theme`), attribut `data-theme="light"` sur `<html>` ; couleurs claires en fin de `css/styles.css`. Le logo est un masque CSS (`.logo-mark`) coloré par `--logo-color`.
 - Écran d'ouverture animé (`#splash` dans `index.html`, styles en fin de `css/styles.css`) : blanc + logo vert, puis vert #009a44 + logo blanc, slogan « Une solution en 1 clic ! », cercle de chargement qui tourne ; environ 4,5 s (minimum 4 s demandé), puis fondu vers l'appli (un clic le passe).
 

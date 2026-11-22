@@ -3,6 +3,7 @@ import { GEO } from "./geo.js";
 import { ICONS, TYPE_ICON } from "./icons.js";
 import { PLACES, norm } from "./search.js";
 import { askAssistant, newSessionId } from "./api.js";
+import { authEnabled, watchUser, signUp, signIn, signOutUser, resetPassword, saveChat } from "./auth.js";
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -23,7 +24,11 @@ const state = {
   tx: "Location", types: new Set(), place: null,
   tts: false, busy: false,
 };
-const persist = () => store.write({ sessionId: state.sessionId, messages: state.messages.slice(-40) });
+const persist = () => {
+  store.write({ sessionId: state.sessionId, messages: state.messages.slice(-40) });
+  if (state.user) saveChat(state.user.uid, state.messages);
+};
+const profileForApi = () => (state.user ? { prenom: state.user.prenom || "", commune: state.user.commune || "" } : null);
 
 /* ---------- Mise en place ---------- */
 function paintIcons(root = document) {
@@ -60,6 +65,7 @@ function closeAll() {
   $("#overlay").classList.remove("show");
   $("#place-sheet").classList.remove("show");
   $("#drawer").classList.remove("show");
+  $("#account-sheet")?.classList.remove("show");
 }
 
 /* ---------- Lecture à voix haute ---------- */
@@ -170,7 +176,7 @@ async function answer(text) {
   const typing = addMsg("<span></span><span></span><span></span>", "bot typing");
   typing.setAttribute("aria-label", "My Key AI écrit…");
   try {
-    const data = await askAssistant({ sessionId: state.sessionId, message: text, history });
+    const data = await askAssistant({ sessionId: state.sessionId, message: text, history, profile: profileForApi() });
     typing.remove();
     const listings = Array.isArray(data.listings) ? data.listings : [];
     state.messages.push({ role: "assistant", content: data.reply, listings });
@@ -227,7 +233,7 @@ async function runFormSearch() {
   btn.disabled = true; btn.textContent = "Recherche en cours…";
   box.innerHTML = '<p class="note">My Key AI cherche les biens qui vous correspondent…</p>';
   try {
-    const data = await askAssistant({ sessionId: state.sessionId, message: q, history: [] });
+    const data = await askAssistant({ sessionId: state.sessionId, message: q, history: [], profile: profileForApi() });
     const listings = Array.isArray(data.listings) ? data.listings : [];
     box.innerHTML = `<div class="msg bot">${esc(data.reply)}</div><div class="results"></div>
       <button class="secondary" data-action="continue-chat">Continuer avec l'assistant</button>`;
@@ -359,6 +365,71 @@ function animateWave() {
   draw();
 }
 
+/* ---------- Compte utilisateur ---------- */
+function renderAccount() {
+  const box = $("#account-box");
+  if (!authEnabled()) { box.classList.add("hidden"); return; }
+  box.classList.remove("hidden");
+  const u = state.user;
+  if (u) {
+    const ident = u.identifiant || "";
+    box.innerHTML = `<div class="who">${esc([u.prenom, u.nom].filter(Boolean).join(" ") || "Mon compte")}<small>${esc(ident)}${u.commune ? " · " + esc(u.commune) : ""}</small></div>
+      <button class="link" data-action="logout">Se déconnecter</button>`;
+  } else {
+    box.innerHTML = `<div class="who">Votre compte<small>Retrouvez vos recherches sur tous vos appareils.</small></div>
+      <button class="primary" data-action="account">Se connecter / Créer un compte</button>`;
+  }
+  const hello = $("#hero p");
+  if (hello) hello.textContent = u?.prenom ? `Bonjour ${u.prenom}, je suis My Key AI !` : "Bonjour, je suis My Key AI !";
+}
+function openAccount(tab = "login") {
+  closeAll();
+  $("#overlay").classList.add("show");
+  $("#account-sheet").classList.add("show");
+  setAuthTab(tab);
+}
+function setAuthTab(tab) {
+  $$("[data-auth-tab]").forEach((b) => b.classList.toggle("on", b.dataset.authTab === tab));
+  $("#login-form").classList.toggle("hidden", tab !== "login");
+  $("#signup-form").classList.toggle("hidden", tab !== "signup");
+  $$(".auth-msg").forEach((m) => { m.textContent = ""; m.classList.toggle("ok", false); });
+  setTimeout(() => $(`#${tab}-form input`)?.focus(), 250);
+}
+function onUser(user) {
+  state.user = user;
+  if (user?.chat && !state.messages.length) {
+    try {
+      const msgs = JSON.parse(user.chat);
+      if (Array.isArray(msgs) && msgs.length) { state.messages = msgs; store.write({ sessionId: state.sessionId, messages: msgs }); renderHistory(); }
+    } catch {}
+  }
+  renderAccount();
+}
+async function submitAuth(form, fn, okMsg) {
+  const msg = form.querySelector(".auth-msg");
+  const btn = form.querySelector("button[type=submit]");
+  const data = Object.fromEntries(new FormData(form));
+  msg.textContent = ""; msg.classList.toggle("ok", false);
+  btn.disabled = true;
+  try {
+    const user = await fn(data);
+    onUser(user);
+    msg.classList.toggle("ok", true); msg.textContent = okMsg(user);
+    form.reset();
+    setTimeout(closeAll, 900);
+  } catch (e) {
+    msg.textContent = e.userMessage || "Une erreur est survenue. Réessayez.";
+  } finally { btn.disabled = false; }
+}
+$("#signup-commune").insertAdjacentHTML("beforeend", Object.keys(GEO).map((c) => `<option>${esc(c)}</option>`).join(""));
+$("#login-form").addEventListener("submit", (e) => { e.preventDefault(); submitAuth(e.target, signIn, (u) => `Bienvenue ${u.prenom || ""} !`); });
+$("#signup-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const f = e.target;
+  if (f.password.value !== f.password2.value) { f.querySelector(".auth-msg").textContent = "Les deux mots de passe ne sont pas identiques."; return; }
+  submitAuth(f, signUp, (u) => `Compte créé. Bienvenue ${u.prenom} !`);
+});
+
 /* ---------- Thème clair / sombre ---------- */
 const THEME_KEY = "mykeyai.theme";
 function applyTheme(theme) {
@@ -402,6 +473,8 @@ async function install() {
 
 /* ---------- Événements ---------- */
 document.addEventListener("click", (e) => {
+  const tabBtn = e.target.closest("[data-auth-tab]");
+  if (tabBtn) return setAuthTab(tabBtn.dataset.authTab);
   const el = e.target.closest("[data-action],[data-type],[data-tx],[data-suggest],[data-place],[data-nav]");
   if (!el) return;
   if (el.dataset.nav) return; // lien #hash géré par hashchange
@@ -427,6 +500,15 @@ document.addEventListener("click", (e) => {
     case "voice-stop": stopListening(); break;
     case "install": install(); break;
     case "theme": toggleTheme(); break;
+    case "account": openAccount("login"); break;
+    case "logout": signOutUser().then(() => onUser(null)); break;
+    case "forgot": {
+      const f = $("#login-form"), m = f.querySelector(".auth-msg");
+      resetPassword(f.identifiant.value)
+        .then(() => { m.classList.toggle("ok", true); m.textContent = "Un e-mail pour choisir un nouveau mot de passe vient de vous être envoyé."; })
+        .catch((err) => { m.classList.toggle("ok", false); m.textContent = err.userMessage || "Indiquez d'abord votre e-mail ci-dessus."; });
+      break;
+    }
     case "close-help": $("#install-help").classList.remove("show"); closeAll(); break;
     case "reset": resetConversation(); break;
   }
@@ -473,6 +555,8 @@ renderHistory();
 route();
 animateWave();
 refreshInstallUI();
+renderAccount();
+watchUser(onUser);
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   // Mise à jour automatique : dès qu'une nouvelle version est publiée, l'appli se recharge une fois.
   const hadController = !!navigator.serviceWorker.controller;
