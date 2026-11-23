@@ -42,6 +42,14 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - Thème clair / sombre : bouton dans le menu, choix gardé dans `localStorage` (`mykeyai.theme`), attribut `data-theme="light"` sur `<html>` ; couleurs claires en fin de `css/styles.css`. Le logo est un masque CSS (`.logo-mark`) coloré par `--logo-color`.
 - Écran d'ouverture animé (`#splash` dans `index.html`, styles en fin de `css/styles.css`) : vert vif #00ff00 + logo blanc, puis blanc + logo vert #009a44, slogan « Une solution en 1 clic ! », cercle de chargement qui tourne ; environ 4,5 s (minimum 4 s demandé), puis fondu vers l'appli (un clic le passe).
 
+## Veille (surveillance)
+- Workflow n8n **« My Key AI – Veille »** (id `WSntB0fKJzqxrTNw`), webhook `POST /webhook/mykey-veille` protégé par un jeton
+  (le jeton est dans la tâche planifiée de Claude, pas dans ce dépôt). Il analyse l'onglet Biens (en-têtes, cases en erreur,
+  doublons, infos manquantes, biens non vérifiés depuis 14 jours, limites) et vérifie le relais Google.
+- Tâche planifiée Claude « Veille My Key AI » : tous les jours à 7h44 et 18h44 (heure d'Abidjan). Elle contrôle aussi
+  les erreurs n8n (quota Gemini…), le déploiement GitHub Pages, les permissions du Sheet et l'absence de secrets dans le code,
+  puis signale les problèmes. Aucune correction sans l'accord (OKAY) du propriétaire.
+
 ## Fichiers
 - `js/config.js` : adresse du chat n8n, délai, langue.
 - `js/api.js` : appel au chat (relais Google puis n8n direct) et messages d'erreur.
