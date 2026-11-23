@@ -316,3 +316,11 @@ a { color: inherit; }
 .auth-msg:empty { display: none; }
 :root[data-theme="light"] .auth-msg { color: #c0392b; }
 :root[data-theme="light"] .auth-msg.ok { color: var(--green); }
+
+/* Petit message de confirmation (haut-parleur, etc.) */
+#toast {
+  position: fixed; left: 50%; bottom: calc(110px + env(safe-area-inset-bottom)); transform: translate(-50%, 10px);
+  padding: 10px 16px; border-radius: 999px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
+  font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 900; white-space: nowrap;
+}
+#toast.show { opacity: 1; transform: translate(-50%, 0); }

@@ -69,18 +69,91 @@ function closeAll() {
 }
 
 /* ---------- Lecture à voix haute ---------- */
-function setTTS(on) {
-  state.tts = on;
-  $$('[data-action="tts"]').forEach((b) => { b.classList.toggle("on", on); b.innerHTML = on ? ICONS.speaker : ICONS.speakerOff; b.setAttribute("aria-pressed", on); });
-  if (!on) try { speechSynthesis.cancel(); } catch {}
+// Le bouton haut-parleur active la lecture des réponses. Le choix est gardé sur l'appareil.
+// Robustesse : voix française choisie explicitement, texte découpé en phrases (Chrome coupe les textes longs),
+// « déblocage » au moment du clic (obligatoire sur mobile), relance si Chrome se met en pause.
+const TTS_KEY = "mykeyai.tts";
+const synth = "speechSynthesis" in window ? window.speechSynthesis : null;
+let frVoice = null, keepAlive = null;
+function pickVoice() {
+  if (!synth) return;
+  const voices = synth.getVoices() || [];
+  frVoice = voices.find((v) => /^fr[-_]FR/i.test(v.lang) && /google|natural|neural|online/i.test(v.name))
+    || voices.find((v) => /^fr[-_]FR/i.test(v.lang))
+    || voices.find((v) => /^fr/i.test(v.lang)) || null;
 }
-function speak(text) {
-  if (!state.tts) return;
-  try {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = CONFIG.speechLang;
-    speechSynthesis.cancel(); speechSynthesis.speak(u);
-  } catch {}
+if (synth) { pickVoice(); try { synth.addEventListener("voiceschanged", pickVoice); } catch { synth.onvoiceschanged = pickVoice; } }
+
+function chunks(text) {
+  const clean = String(text || "").replace(/[*_#>`]/g, " ").replace(/\s+/g, " ").trim();
+  const parts = clean.match(/[^.!?…]+[.!?…]*\s*/g) || [clean];
+  const out = [];
+  for (let part of parts) {
+    part = part.trim();
+    while (part.length > 180) {
+      let cut = part.lastIndexOf(",", 180); if (cut < 60) cut = part.lastIndexOf(" ", 180); if (cut < 60) cut = 180;
+      out.push(part.slice(0, cut + 1).trim()); part = part.slice(cut + 1).trim();
+    }
+    if (part) out.push(part);
+  }
+  return out;
+}
+function stopSpeaking() {
+  clearInterval(keepAlive); keepAlive = null;
+  try { synth && synth.cancel(); } catch {}
+}
+function say(text, { force = false } = {}) {
+  if (!synth || (!state.tts && !force)) return;
+  stopSpeaking();
+  const list = chunks(text);
+  if (!list.length) return;
+  list.forEach((t, i) => {
+    const u = new SpeechSynthesisUtterance(t);
+    u.lang = frVoice?.lang || CONFIG.speechLang;
+    if (frVoice) u.voice = frVoice;
+    u.rate = 1; u.pitch = 1; u.volume = 1;
+    if (i === list.length - 1) u.onend = u.onerror = () => { clearInterval(keepAlive); keepAlive = null; };
+    synth.speak(u);
+  });
+  try { synth.resume(); } catch {}
+  // Chrome (ordinateur) arrête parfois la lecture au bout de ~15 s : on la relance.
+  keepAlive = setInterval(() => { if (!synth.speaking) { clearInterval(keepAlive); keepAlive = null; return; } if (synth.paused) synth.resume(); }, 5000);
+}
+function renderTTS() {
+  const on = state.tts;
+  $$('[data-action="tts"]').forEach((b) => {
+    b.classList.toggle("on", on); b.innerHTML = on ? ICONS.speaker : ICONS.speakerOff;
+    b.setAttribute("aria-pressed", on);
+    b.setAttribute("aria-label", on ? "Désactiver la lecture à voix haute" : "Activer la lecture à voix haute");
+    b.title = on ? "Lecture à voix haute activée" : "Lecture à voix haute désactivée";
+  });
+}
+function setTTS(on, { announce = true } = {}) {
+  if (on && !synth) { toast("La lecture à voix haute n'est pas disponible sur ce navigateur."); on = false; }
+  state.tts = on;
+  try { localStorage.setItem(TTS_KEY, on ? "1" : "0"); } catch {}
+  renderTTS();
+  if (!on) { stopSpeaking(); if (announce) toast("Lecture à voix haute désactivée"); return; }
+  if (announce) {
+    // Dit quelque chose tout de suite, pendant le clic : c'est ce qui autorise la lecture sur mobile.
+    say("Lecture à voix haute activée. Je vous lirai mes réponses.", { force: true });
+    toast("Lecture à voix haute activée");
+  }
+}
+function speak(text) { say(text); }
+// Sur mobile, la lecture n'est autorisée qu'après un geste de l'utilisateur : on « débloque » la voix au premier toucher.
+const unlockVoice = () => {
+  if (!synth || !state.tts) return;
+  try { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; u.lang = CONFIG.speechLang; synth.speak(u); } catch {}
+};
+document.addEventListener("pointerdown", unlockVoice, { once: true, capture: true });
+
+let toastTimer = null;
+function toast(msg) {
+  let t = $("#toast");
+  if (!t) { t = document.createElement("div"); t.id = "toast"; t.setAttribute("role", "status"); document.body.appendChild(t); }
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
 }
 
 /* ---------- Fiches de biens (format renvoyé par le chat n8n) ---------- */
@@ -557,6 +630,8 @@ animateWave();
 refreshInstallUI();
 renderAccount();
 watchUser(onUser);
+try { state.tts = localStorage.getItem(TTS_KEY) === "1" && !!synth; } catch {}
+renderTTS();
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   // Mise à jour automatique : dès qu'une nouvelle version est publiée, l'appli se recharge une fois.
   const hadController = !!navigator.serviceWorker.controller;
