@@ -31,13 +31,15 @@ export async function askAssistant({ sessionId, message, history, profile }) {
       res = await send();
     }
   } catch (e) {
-    throw fail(e.name === "AbortError"
+    const err = fail(e.name === "AbortError"
       ? "L'assistant met trop de temps à répondre. Réessayez dans un instant."
       : "Impossible de joindre l'assistant. Vérifiez votre connexion internet et réessayez.");
+    err.detail = `${e.name || "Erreur"} : ${e.message || ""} · ${navigator.onLine === false ? "hors ligne" : "en ligne"} · ${new Date().toLocaleTimeString("fr-FR")}`;
+    throw err;
   } finally {
     clearTimeout(timer);
   }
-  if (!res.ok) throw fail("L'assistant est momentanément indisponible. Réessayez dans quelques minutes.");
+  if (!res.ok) { const err = fail("L'assistant est momentanément indisponible. Réessayez dans quelques minutes."); err.detail = `HTTP ${res.status} · ${new Date().toLocaleTimeString("fr-FR")}`; throw err; }
   let data;
   try { data = await res.json(); } catch { throw fail("Réponse inattendue de l'assistant. Réessayez."); }
   if (!data || typeof data.reply !== "string") throw fail("Réponse inattendue de l'assistant. Réessayez.");

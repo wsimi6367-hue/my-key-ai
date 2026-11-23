@@ -260,7 +260,7 @@ async function answer(text) {
   } catch (err) {
     typing.remove();
     state.messages.pop(); persist();
-    const el = addMsg(`${esc(err.userMessage || "La connexion a échoué. Vérifiez votre connexion internet et réessayez.")} <button class="retry" type="button">Réessayer</button>`, "bot error");
+    const el = addMsg(`${esc(err.userMessage || "La connexion a échoué. Vérifiez votre connexion internet et réessayez.")} <button class="retry" type="button">Réessayer</button>${err.detail ? `<small class="err-detail">${esc(err.detail)}</small>` : ""}`, "bot error");
     el.querySelector(".retry").addEventListener("click", () => { el.previousElementSibling?.remove(); el.remove(); state.busy = false; answer(text); }, { once: true });
   } finally {
     state.busy = false;
