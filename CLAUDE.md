@@ -28,7 +28,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - Mémoire : la conversation et le `sessionId` sont gardés dans `localStorage` (l'appli fonctionne aussi sans).
 - PWA : `manifest.webmanifest`, `sw.js` (coquille en cache, réseau d'abord, le chat n'est jamais mis en cache),
   icônes dans `icons/`. Bouton « Installer l'application » dans le menu (aide pas à pas sur iPhone).
-- Lecture à voix haute des réponses (speechSynthesis).
+- Lecture à voix haute des réponses (speechSynthesis) via le bouton haut-parleur : voix française choisie, texte découpé en phrases, déblocage au premier toucher sur mobile, choix gardé dans `localStorage` (`mykeyai.tts`), message de confirmation (`#toast`).
 - Comptes utilisateurs (facultatifs) : Firebase Authentication (e-mail ou téléphone + mot de passe) et Firestore.
   - `js/firebase-config.js` : objet `firebaseConfig` du projet Firebase (si `null`, l'appli marche sans comptes et le bloc « Votre compte » est masqué).
   - `js/auth.js` : inscription, connexion, déconnexion, mot de passe oublié (comptes e-mail), sauvegarde de la conversation.
