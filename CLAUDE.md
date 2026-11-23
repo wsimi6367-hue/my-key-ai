@@ -22,6 +22,9 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
     lecture brute de l'onglet Biens via l'API Sheets (compte Google de n8n, lecture seule ; la ligne d'en-têtes est retrouvée où qu'elle soit) →
     catalogue des biens Disponibles trié du plus récent au plus ancien (date de publication, sinon d'enregistrement, sinon position ; 400 max) →
     agent IA (Gemini, modèle `gemini-3-flash-preview`) qui parcourt d'abord les annonces récentes puis remonte vers les plus anciennes, et renvoie `{ ids, reply }` → fiches complètes renvoyées à l'appli.
+- Relais Google Apps Script (`relais/Code.gs`, URL dans `CONFIG.relayUrl`) : l'appli l'appelle en premier (POST `text/plain`, sans pré-vérification CORS),
+  il transmet à n8n ; si le relais est injoignable, l'appli appelle n8n directement. Raison : certains wifi bloquent l'adresse `*.app.n8n.cloud`.
+  Le relais renvoie `{ error: "assistant", status }` si n8n répond en erreur, `{ error: "relais" }` s'il ne joint pas n8n.
 - Un `Bien` renvoyé : `id, demo, transaction, type, titre, commune, zone, quartier, repere, prix, periodicite, conditions,
   surface, pieces, chambres, sdb, meuble, equipements, description, publie, contact{nom,typeAnnonceur,telephone,whatsapp,email},
   plateforme, url, image, autresImages`.
@@ -41,7 +44,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 
 ## Fichiers
 - `js/config.js` : adresse du chat n8n, délai, langue.
-- `js/api.js` : appel au chat et messages d'erreur.
+- `js/api.js` : appel au chat (relais Google puis n8n direct) et messages d'erreur.
 - `js/app.js` : interface, navigation, chat, fiches de biens, choix du lieu, vocal, installation.
 - `js/geo.js` : référentiel Commune > Zone > Quartier (14 communes du District d'Abidjan). Doit rester identique à l'onglet « Quartiers » du Sheet.
 - `js/search.js` : liste des lieux pour le sélecteur (`PLACES`, `norm`). Ses fonctions de recherche par règles ne sont plus utilisées par l'interface.
