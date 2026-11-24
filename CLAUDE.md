@@ -21,7 +21,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
   - Étapes : contrôle du message (limite 80 messages / session / jour, 3000 / jour au total) →
     lecture brute de l'onglet Biens via l'API Sheets (compte Google de n8n, lecture seule ; la ligne d'en-têtes est retrouvée où qu'elle soit) →
     relecture des colonnes Téléphone/WhatsApp (W:X) en mode formule pour récupérer un numéro affiché « #ERROR! » (numéro tapé avec « + ») →
-    catalogue des biens Disponibles trié du plus récent au plus ancien (date de publication, sinon d'enregistrement, sinon position ; 400 max) →
+    catalogue des biens Disponibles trié du plus récent au plus ancien (date de publication, sinon d'enregistrement, sinon position ; 1500 max) →
     présélection (« Shrink Catalog », étape « le système trie ») : d'après le message + les 3 derniers messages du client, filtre par Ville,
     Type de location / vente (longue durée, courte durée : nuit / week-end / séjour, vente) et type de bien ; s'il reste moins de 4 annonces,
     on relâche un critère à la fois (la ville en dernier ; une ville hors Abidjan reste prioritaire dès qu'une annonce y correspond) ;
