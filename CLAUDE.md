@@ -22,6 +22,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
     lecture brute de l'onglet Biens via l'API Sheets (compte Google de n8n, lecture seule ; la ligne d'en-têtes est retrouvée où qu'elle soit) →
     relecture des colonnes Téléphone/WhatsApp (W:X) en mode formule pour récupérer un numéro affiché « #ERROR! » (numéro tapé avec « + ») →
     catalogue des biens Disponibles trié du plus récent au plus ancien (date de publication, sinon d'enregistrement, sinon position ; 400 max) →
+    présélection (« Shrink Catalog ») : seulement les annonces du type / de la transaction demandés (message + 3 derniers messages du client), version courte, 120 max ; tout le catalogue si moins de 4 →
     agent IA (Gemini, modèle `gemini-3-flash-preview`) qui parcourt d'abord les annonces récentes puis remonte vers les plus anciennes, et renvoie `{ ids, reply }` → fiches complètes renvoyées à l'appli.
 - Relais Google Apps Script (`relais/Code.gs`, URL dans `CONFIG.relayUrl`) : l'appli l'appelle en premier (POST `text/plain`, sans pré-vérification CORS),
   il transmet à n8n ; si le relais est injoignable, l'appli appelle n8n directement. Raison : certains wifi bloquent l'adresse `*.app.n8n.cloud`.
@@ -85,7 +86,7 @@ Ne proposer au client que les lignes `Disponibilité = Disponible`.
 2. **Canal WhatsApp** : WhatsApp Business Cloud API dans n8n, branché sur le même workflow.
 3. Script Apps Script dans le Sheet pour remplir automatiquement ID et date d'enregistrement.
 4. Recherche par photo (bouton appareil photo) : non implémentée, affiche un message.
-5. Si la base dépasse quelques centaines de biens : pré-filtrer (commune, type, budget) avant d'envoyer le catalogue à l'IA.
+5. Présélection par type déjà en place ; si la base dépasse plusieurs centaines de biens d'un même type, filtrer aussi par commune et budget.
 
 ## Conventions
 - Interface en français, tutoiement interdit (vouvoiement).
