@@ -104,17 +104,47 @@ export async function resetPassword(identifiant) {
   catch (e) { throw wrap(e); }
 }
 
-// Sauvegarde de la conversation dans le compte (pour la retrouver sur un autre appareil).
-let saveTimer = null;
-export function saveChat(uid, messages) {
-  if (!fb || !uid) return;
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(async () => {
+// Conversations du compte : users/{uid}/conversations/{convId}
+//   { title, updatedAt (ms), count, messages (JSON des 40 derniers messages) }
+const slim = (m) => {
+  const o = { role: m.role, content: String(m.content || "").slice(0, 4000) };
+  if (Array.isArray(m.listings) && m.listings.length) o.listings = m.listings.slice(0, 6);
+  return o;
+};
+export function convTitle(messages) {
+  const first = (messages || []).find((m) => m.role === "user");
+  const t = String(first?.content || "Conversation").replace(/\s+/g, " ").trim();
+  return t.length > 60 ? t.slice(0, 57) + "…" : t;
+}
+const saveTimers = {};
+export function saveConversation(uid, convId, messages) {
+  if (!fb || !uid || !convId || !messages?.length) return;
+  clearTimeout(saveTimers[convId]);
+  saveTimers[convId] = setTimeout(async () => {
     try {
       const { db, F } = fb;
-      const chat = JSON.stringify(messages.slice(-30));
-      if (chat.length > 800000) return;
-      await F.setDoc(F.doc(db, "users", uid), { chat, updatedAt: F.serverTimestamp() }, { merge: true });
+      let list = messages.slice(-40).map(slim);
+      let json = JSON.stringify(list);
+      while (json.length > 700000 && list.length > 2) { list = list.slice(2); json = JSON.stringify(list); }
+      await F.setDoc(F.doc(db, "users", uid, "conversations", convId),
+        { title: convTitle(messages), updatedAt: Date.now(), count: messages.length, messages: json });
     } catch {}
-  }, 1200);
+  }, 1000);
+}
+export async function listConversations(uid) {
+  if (!fb || !uid) return [];
+  const { db, F } = fb;
+  const q = F.query(F.collection(db, "users", uid, "conversations"), F.orderBy("updatedAt", "desc"), F.limit(30));
+  const snap = await F.getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, title: d.data().title || "Conversation", updatedAt: d.data().updatedAt || 0, count: d.data().count || 0 }));
+}
+export async function getConversation(uid, convId) {
+  const { db, F } = await load();
+  const snap = await F.getDoc(F.doc(db, "users", uid, "conversations", convId));
+  if (!snap.exists()) return null;
+  try { return JSON.parse(snap.data().messages || "[]"); } catch { return []; }
+}
+export async function deleteConversation(uid, convId) {
+  const { db, F } = await load();
+  await F.deleteDoc(F.doc(db, "users", uid, "conversations", convId));
 }

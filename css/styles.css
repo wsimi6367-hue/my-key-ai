@@ -326,3 +326,20 @@ a { color: inherit; }
 #toast.show { opacity: 1; transform: translate(-50%, 0); }
 
 .msg .err-detail { display: block; margin-top: 8px; font-size: 11px; color: var(--muted); word-break: break-word; }
+
+/* Liste des conversations du compte (menu) */
+.drawer { overflow-y: auto; }
+.conv-box { margin: 2px 0 8px; }
+.conv-head { font-size: 12px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); padding: 6px 10px; }
+.conv-box ul { list-style: none; margin: 0; padding: 0; max-height: 38vh; overflow-y: auto; }
+.conv-box li { display: flex; align-items: center; border-radius: 12px; }
+.conv-box li.current { background: var(--surface-2); }
+.conv-box li:hover { background: var(--surface-2); }
+.conv-open { flex: 1; min-width: 0; text-align: left; padding: 10px; display: grid; gap: 2px; }
+.conv-open .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; }
+.conv-box li.current .conv-open .t { color: var(--green); }
+.conv-open small { color: var(--muted); font-size: 11px; }
+.conv-del { width: 34px; height: 34px; flex: none; display: grid; place-items: center; color: var(--muted); border-radius: 10px; }
+.conv-del:hover { color: #ff8a7a; }
+.conv-del svg { width: 16px; height: 16px; }
+.conv-empty { color: var(--muted); font-size: 13px; padding: 8px 10px; }

@@ -3,7 +3,7 @@ import { GEO } from "./geo.js";
 import { ICONS, TYPE_ICON } from "./icons.js";
 import { PLACES, norm } from "./search.js";
 import { askAssistant, newSessionId } from "./api.js";
-import { authEnabled, watchUser, signUp, signIn, signOutUser, resetPassword, saveChat } from "./auth.js";
+import { authEnabled, watchUser, signUp, signIn, signOutUser, resetPassword, saveConversation, listConversations, getConversation, deleteConversation } from "./auth.js";
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -18,15 +18,30 @@ const store = {
 };
 
 const saved = store.read();
+const newConvId = () => "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 const state = {
   sessionId: saved?.sessionId || newSessionId(),
+  convId: saved?.convId || newConvId(),
+  convs: [],
   messages: Array.isArray(saved?.messages) ? saved.messages.slice(-40) : [], // { role, content, listings? }
   tx: "Location", types: new Set(), place: null,
   tts: false, busy: false,
 };
 const persist = () => {
-  store.write({ sessionId: state.sessionId, messages: state.messages.slice(-40) });
-  if (state.user) saveChat(state.user.uid, state.messages);
+  store.write({ sessionId: state.sessionId, convId: state.convId, messages: state.messages.slice(-40) });
+  if (state.user && state.messages.length) {
+    saveConversation(state.user.uid, state.convId, state.messages);
+    // Mise à jour immédiate de la liste affichée dans le menu.
+    const i = state.convs.findIndex((c) => c.id === state.convId);
+    const item = { id: state.convId, title: (state.convs[i]?.title) || convTitleLocal(), updatedAt: Date.now(), count: state.messages.length };
+    if (i >= 0) state.convs.splice(i, 1);
+    state.convs.unshift(item);
+    renderConvs();
+  }
+};
+const convTitleLocal = () => {
+  const t = String(state.messages.find((m) => m.role === "user")?.content || "Conversation").replace(/\s+/g, " ").trim();
+  return t.length > 60 ? t.slice(0, 57) + "…" : t;
 };
 const profileForApi = () => (state.user ? { prenom: state.user.prenom || "", commune: state.user.commune || "" } : null);
 
@@ -284,6 +299,7 @@ function updateMicSend() {
 function resetConversation() {
   state.messages = [];
   state.sessionId = newSessionId();
+  state.convId = newConvId();
   store.clear(); persist();
   renderHistory();
   closeAll();
@@ -469,14 +485,80 @@ function setAuthTab(tab) {
   setTimeout(() => $(`#${tab}-form input`)?.focus(), 250);
 }
 function onUser(user) {
+  const wasLogged = !!state.user;
   state.user = user;
-  if (user?.chat && !state.messages.length) {
-    try {
-      const msgs = JSON.parse(user.chat);
-      if (Array.isArray(msgs) && msgs.length) { state.messages = msgs; store.write({ sessionId: state.sessionId, messages: msgs }); renderHistory(); }
-    } catch {}
+  if (user) {
+    // Ancienne sauvegarde unique (avant la liste des conversations) : on la reprend une fois.
+    if (user.chat && !state.messages.length) {
+      try { const msgs = JSON.parse(user.chat); if (Array.isArray(msgs) && msgs.length) { state.messages = msgs; renderHistory(); } } catch {}
+    }
+    if (state.messages.length) persist(); // la conversation en cours rejoint le compte
+    refreshConvs();
+  } else {
+    state.convs = [];
+    if (wasLogged) resetConversation(); // déconnexion : on ne laisse pas la discussion sur l'appareil
   }
   renderAccount();
+  renderConvs();
+}
+
+/* ---------- Liste des conversations du compte (menu) ---------- */
+const fmtDate = (ms) => {
+  if (!ms) return "";
+  const d = new Date(ms), now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  const yest = new Date(now - 86400000).toDateString() === d.toDateString();
+  const hm = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  return sameDay ? `Aujourd'hui ${hm}` : yest ? `Hier ${hm}` : d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
+};
+async function refreshConvs() {
+  if (!state.user) return;
+  try {
+    const list = await listConversations(state.user.uid);
+    // garde en tête la conversation en cours si elle n'est pas encore enregistrée
+    const cur = state.convs.find((c) => c.id === state.convId && !list.some((x) => x.id === c.id));
+    state.convs = cur ? [cur, ...list] : list;
+    state.convsError = false;
+  } catch { state.convsError = true; }
+  renderConvs();
+}
+function renderConvs() {
+  const box = $("#conv-box");
+  if (!box) return;
+  if (!state.user) { box.classList.add("hidden"); return; }
+  box.classList.remove("hidden");
+  const list = $("#conv-list");
+  if (state.convsError) { list.innerHTML = `<li class="conv-empty">Impossible de charger vos conversations pour le moment.</li>`; return; }
+  if (!state.convs.length) { list.innerHTML = `<li class="conv-empty">Vos conversations apparaîtront ici.</li>`; return; }
+  list.innerHTML = state.convs.map((c) => `
+    <li class="${c.id === state.convId ? "current" : ""}">
+      <button class="conv-open" data-conv-open="${esc(c.id)}"><span class="t">${esc(c.title)}</span><small>${esc(fmtDate(c.updatedAt))}</small></button>
+      <button class="conv-del" data-conv-del="${esc(c.id)}" aria-label="Supprimer cette conversation" title="Supprimer">${ICONS.trash}</button>
+    </li>`).join("");
+}
+async function openConv(id) {
+  if (id === state.convId) { closeAll(); go("assistant"); return; }
+  try {
+    const msgs = await getConversation(state.user.uid, id);
+    if (!msgs) { toast("Conversation introuvable."); refreshConvs(); return; }
+    state.convId = id;
+    state.sessionId = newSessionId();
+    state.messages = msgs;
+    store.write({ sessionId: state.sessionId, convId: state.convId, messages: msgs.slice(-40) });
+    renderHistory(); renderConvs();
+    closeAll(); go("assistant");
+    setTimeout(scrollChat, 50);
+  } catch { toast("Impossible d'ouvrir cette conversation. Réessayez."); }
+}
+async function removeConv(id) {
+  if (!confirm("Supprimer définitivement cette conversation ?")) return;
+  try {
+    await deleteConversation(state.user.uid, id);
+    state.convs = state.convs.filter((c) => c.id !== id);
+    if (id === state.convId) { state.messages = []; state.convId = newConvId(); state.sessionId = newSessionId(); store.clear(); renderHistory(); }
+    renderConvs();
+    toast("Conversation supprimée");
+  } catch { toast("Suppression impossible pour le moment. Réessayez."); }
 }
 async function submitAuth(form, fn, okMsg) {
   const msg = form.querySelector(".auth-msg");
@@ -546,6 +628,10 @@ async function install() {
 
 /* ---------- Événements ---------- */
 document.addEventListener("click", (e) => {
+  const convOpen = e.target.closest("[data-conv-open]");
+  if (convOpen) return openConv(convOpen.dataset.convOpen);
+  const convDel = e.target.closest("[data-conv-del]");
+  if (convDel) return removeConv(convDel.dataset.convDel);
   const tabBtn = e.target.closest("[data-auth-tab]");
   if (tabBtn) return setAuthTab(tabBtn.dataset.authTab);
   const el = e.target.closest("[data-action],[data-type],[data-tx],[data-suggest],[data-place],[data-nav]");
@@ -561,7 +647,7 @@ document.addEventListener("click", (e) => {
     return renderPlaces(p.open, p.commune, p.zone);
   }
   switch (el.dataset.action) {
-    case "menu": $("#overlay").classList.add("show"); $("#drawer").classList.add("show"); break;
+    case "menu": $("#overlay").classList.add("show"); $("#drawer").classList.add("show"); refreshConvs(); break;
     case "tts": setTTS(!state.tts); break;
     case "pick-place": openPlaces(); break;
     case "search": runFormSearch(); break;

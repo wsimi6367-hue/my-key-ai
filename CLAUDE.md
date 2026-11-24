@@ -36,9 +36,12 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - Comptes utilisateurs (facultatifs) : Firebase Authentication (e-mail ou téléphone + mot de passe) et Firestore.
   - `js/firebase-config.js` : objet `firebaseConfig` du projet Firebase **`my-key-ai`** (forfait Spark gratuit ; connexion e-mail/mot de passe activée ;
     domaine autorisé `wsimi6367-hue.github.io` ; Firestore édition Standard, règles de `firestore.rules` publiées). Si `null`, l'appli marche sans comptes.
-  - `js/auth.js` : inscription, connexion, déconnexion, mot de passe oublié (comptes e-mail), sauvegarde de la conversation.
+  - `js/auth.js` : inscription, connexion, déconnexion, mot de passe oublié (comptes e-mail), conversations du compte.
     Un numéro de téléphone est converti en adresse technique `225XXXXXXXXXX@tel.mykeyai.app`.
-  - Fiche Firestore `users/{uid}` : `prenom, nom, commune, identifiant, type ("email"|"tel"), chat (JSON des 30 derniers messages), createdAt, updatedAt`.
+  - Fiche Firestore `users/{uid}` : `prenom, nom, commune, identifiant, type ("email"|"tel"), createdAt, updatedAt` (ancien champ `chat` repris une fois).
+  - Conversations : `users/{uid}/conversations/{convId}` = `{ title, updatedAt (ms), count, messages (JSON des 40 derniers) }`.
+    Menu ☰ > « Mes conversations » (compte connecté) : rouvrir, supprimer ; « Nouvelle conversation » en crée une nouvelle.
+    À la déconnexion, la discussion en cours est effacée de l'appareil.
   - Règles de sécurité : `firestore.rules` (chacun ne lit et n'écrit que sa fiche).
   - L'appli envoie `profile: { prenom, commune }` au chat n8n ; l'IA cherche d'abord dans cette commune si la demande ne précise pas de lieu.
 - Thème clair / sombre : bouton dans le menu, choix gardé dans `localStorage` (`mykeyai.theme`), attribut `data-theme="light"` sur `<html>` ; couleurs claires en fin de `css/styles.css`. Le logo est un masque CSS (`.logo-mark`) coloré par `--logo-color`.
