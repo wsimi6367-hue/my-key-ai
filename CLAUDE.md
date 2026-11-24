@@ -55,9 +55,20 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - Workflow n8n **« My Key AI – Veille »** (id `WSntB0fKJzqxrTNw`), webhook `POST /webhook/mykey-veille` protégé par un jeton
   (le jeton est dans la tâche planifiée de Claude, pas dans ce dépôt). Il analyse l'onglet Biens (en-têtes, cases en erreur,
   doublons, infos manquantes, biens non vérifiés depuis 14 jours, limites) et vérifie le relais Google.
-- Tâche planifiée Claude « Veille My Key AI » : tous les jours à 7h44 et 18h44 (heure d'Abidjan). Elle contrôle aussi
+- Tâche planifiée Claude « Veille My Key AI » : tous les jours à 7h44 et 18h44 (heure d'Abidjan). Elle applique les corrections sûres (voir plus bas) et contrôle aussi
   les erreurs n8n (quota Gemini…), le déploiement GitHub Pages, les permissions du Sheet et l'absence de secrets dans le code,
   puis signale les problèmes. Aucune correction sans l'accord (OKAY) du propriétaire.
+
+## Corrections automatiques
+- Workflow n8n **« My Key AI – Corrections »** (id `bgQLIoCGWLElRmUz`), webhook `POST /webhook/mykey-corrections` protégé par un jeton
+  (dans la tâche planifiée de Claude, pas dans ce dépôt). Le compte n8n est donc **Éditeur** du Sheet (accord du propriétaire, 24/11/2026).
+  - `{mode:"auto", dryRun:true}` : liste les corrections sûres sans écrire ; `{mode:"auto", maxWrites:N}` : écrit (rien si plus de N).
+  - Corrige seulement : Commune / Zone / Ville d'après la Localisation (onglet Quartiers), Localisation ou valeur de menu mal écrite
+    (accents, tirets, ancien format « Bingerville – Bingerville – … », 1 lettre d'écart et une seule possibilité), cases vides déductibles
+    (Ville, Type de location / vente, Catégorie). Écrit en RAW, uniquement les cellules concernées. Le reste est renvoyé dans `aSignaler`.
+  - `{cells:[{range, old, new}]}` : correction précise d'une cellule, écrite seulement si sa valeur actuelle = `old`.
+- La veille l'appelle : essai à blanc → relecture → écriture → nouvel essai à blanc (doit donner 0). Jamais de suppression, ni prix,
+  contact, disponibilité ou lieu deviné sans OKAY du propriétaire.
 
 ## Fichiers
 - `js/config.js` : adresse du chat n8n, délai, langue.
@@ -74,13 +85,13 @@ ID : `10gUFQ44l1SUuitSkhM0uYSMCtsmrJbXk7lHITNVbqAY`. Onglets : Guide, Tableau de
 
 Onglet `Biens`, une ligne par bien, en-têtes exacts (ligne 1) :
 ID · Saisi par · Date et heure d'enregistrement · Transaction (Location|Vente) · Type de bien ·
-Titre / résumé · Localisation (choisir) · Commune (formule) · Zone (formule) · Repère / adresse · Prix ·
+Titre / résumé · Localisation (choisir) · Commune · Zone · Repère / adresse · Prix ·
 Périodicité · Conditions (caution, avance…) · Surface (m²) · Pièces · Chambres · Salles de bain · Meublé ·
 Équipements · Description · Publié par (nom) · Type d'annonceur · Téléphone · WhatsApp · Email ·
 Plateforme · URL de la publication · Date et heure de publication · Image principale (URL) ·
 Autres images (URL) · Disponibilité (Disponible|À vérifier|Réservé|Loué / vendu|Retiré) ·
 Dernière vérification · Notes · Ville (AH) · Type de location / vente (AI : Location longue durée|Location courte durée|Vente) ·
-Catégorie (AJ : Habitation|Hébergement|Terrain|Commercial|Événementiel…) · Standing (AK : Économique|Standard|Haut standing|Luxe) ·
+Catégorie (AJ : Habitation|Hébergement|Commercial / professionnel|Terrain|Événementiel|Autre) · Standing (AK : Économique|Moyen standing|Haut standing|Luxe) ·
 Capacité (personnes) (AL)
 
 Colonnes AH–AL ajoutées le 24/11/2026 (sauvegarde avant changement : « SAUVEGARDE 24-11-2026 – les biens data base (avant restructuration) »).
@@ -89,6 +100,9 @@ n8n le déduit (commune d'Abidjan → Abidjan ; Périodicité Journalier/Hebdoma
 Onglet Quartiers : colonne E « Ville » ; autres villes (Grand-Bassam, Assinie, Bonoua, Jacqueville, Dabou, Sikensi, Yamoussoukro,
 Fresco, Sassandra, San-Pédro, Bouaké) en fin d'onglet, au format « Ville – Quartier » avec Commune = Zone = Ville.
 Une seule table pour tout (pas de fichiers séparés par ville ou par type) : le filtrage se fait dans n8n.
+ATTENTION : Commune (H) et Zone (I) sont des valeurs écrites, PAS des formules : elles ne suivent pas la Localisation toute seule.
+Les valeurs doivent être écrites exactement comme dans les menus (onglet Listes). Ville : les 14 communes d'Abidjan (dont Bingerville) = « Abidjan ».
+Le Sheet est aussi rempli par une IA de saisie externe (hors n8n) : ne jamais déplacer, trier ou supprimer de lignes ou de colonnes.
 
 « Localisation (choisir) » vaut `Commune – Zone – Quartier` (ou `Commune – Quartier` quand la commune n'a qu'une zone).
 Ne proposer au client que les lignes `Disponibilité = Disponible`.
