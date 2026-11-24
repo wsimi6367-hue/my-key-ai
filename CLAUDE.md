@@ -33,7 +33,8 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
   icônes dans `icons/`. Bouton « Installer l'application » dans le menu (aide pas à pas sur iPhone).
 - Lecture à voix haute des réponses (speechSynthesis) via le bouton haut-parleur : voix française choisie, texte découpé en phrases, déblocage au premier toucher sur mobile, choix gardé dans `localStorage` (`mykeyai.tts`), message de confirmation (`#toast`).
 - Comptes utilisateurs (facultatifs) : Firebase Authentication (e-mail ou téléphone + mot de passe) et Firestore.
-  - `js/firebase-config.js` : objet `firebaseConfig` du projet Firebase (si `null`, l'appli marche sans comptes et le bloc « Votre compte » est masqué).
+  - `js/firebase-config.js` : objet `firebaseConfig` du projet Firebase **`my-key-ai`** (forfait Spark gratuit ; connexion e-mail/mot de passe activée ;
+    domaine autorisé `wsimi6367-hue.github.io` ; Firestore édition Standard, règles de `firestore.rules` publiées). Si `null`, l'appli marche sans comptes.
   - `js/auth.js` : inscription, connexion, déconnexion, mot de passe oublié (comptes e-mail), sauvegarde de la conversation.
     Un numéro de téléphone est converti en adresse technique `225XXXXXXXXXX@tel.mykeyai.app`.
   - Fiche Firestore `users/{uid}` : `prenom, nom, commune, identifiant, type ("email"|"tel"), chat (JSON des 30 derniers messages), createdAt, updatedAt`.
