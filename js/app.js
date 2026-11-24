@@ -178,7 +178,7 @@ const safeUrl = (u) => /^https?:\/\//i.test(String(u || "").trim()) ? String(u).
 
 function listingCard(b) {
   const isSale = b.transaction === "Vente";
-  const loc = [b.quartier && b.quartier !== "Autre / non précisé" ? b.quartier : null, b.zone && b.zone !== b.commune ? b.zone : null, b.commune].filter(Boolean).join(", ");
+  const loc = [b.quartier && b.quartier !== "Autre / non précisé" ? b.quartier : null, b.zone && b.zone !== b.commune ? b.zone : null, b.commune, b.ville && b.ville !== b.commune && b.ville !== "Abidjan" ? b.ville : null].filter(Boolean).join(", ");
   const facts = [
     b.chambres ? `${b.chambres} ch.` : null,
     b.pieces ? `${b.pieces} pièce${b.pieces > 1 ? "s" : ""}` : null,
@@ -362,17 +362,17 @@ function renderPlaces(level, commune, zone) {
   $("#place-search").value = "";
   if (level === "communes") {
     title.textContent = "Où cherchez-vous ?";
-    list.innerHTML = placeItem("Toutes les communes", { clear: true }, "", "all") +
+    list.innerHTML = placeItem("Tous les lieux", { clear: true }, "", "all") +
       Object.keys(GEO).map((c) => placeItem(c, { open: "zones", commune: c }, Object.keys(GEO[c]).length > 1 ? `${Object.keys(GEO[c]).length} zones` : "")).join("");
   } else if (level === "zones") {
     const zones = Object.keys(GEO[commune]);
     if (zones.length === 1) return renderPlaces("quartiers", commune, zones[0]);
-    title.innerHTML = `<button class="back" data-place='{"open":"communes"}'>‹ Communes</button> ${esc(commune)}`;
+    title.innerHTML = `<button class="back" data-place='{"open":"communes"}'>‹ Lieux</button> ${esc(commune)}`;
     list.innerHTML = placeItem(`Tout ${commune}`, { pick: { level: "commune", name: commune, commune } }, "", "all") +
       zones.map((z) => placeItem(z, { open: "quartiers", commune, zone: z }, `${GEO[commune][z].length} quartiers`)).join("");
   } else {
     const multi = Object.keys(GEO[commune]).length > 1;
-    title.innerHTML = `<button class="back" data-place='${esc(JSON.stringify(multi ? { open: "zones", commune } : { open: "communes" }))}'>‹ ${multi ? esc(commune) : "Communes"}</button> ${esc(zone)}`;
+    title.innerHTML = `<button class="back" data-place='${esc(JSON.stringify(multi ? { open: "zones", commune } : { open: "communes" }))}'>‹ ${multi ? esc(commune) : "Lieux"}</button> ${esc(zone)}`;
     const all = multi ? { level: "zone", name: zone, commune, zone } : { level: "commune", name: commune, commune };
     list.innerHTML = placeItem(`Tout ${zone}`, { pick: all }, "", "all") +
       GEO[commune][zone].map((q) => placeItem(q, { pick: { level: "quartier", name: q, commune, zone, quartier: q } })).join("");

@@ -1,4 +1,5 @@
-// Référentiel géographique d'Abidjan : Commune > Zone > Quartier.
+// Référentiel géographique : les 14 communes du District d'Abidjan (Commune > Zone > Quartier),
+// puis les autres villes (Ville > Ville > Quartier ; dans le Sheet, Commune = Zone = Ville).
 // Identique à l'onglet « Quartiers » du Google Sheet. À tenir synchronisé.
 export const GEO = {
   "Cocody": {
@@ -283,6 +284,90 @@ export const GEO = {
   "Brofodoumé": {
     "Brofodoumé": [
       "Brofodoumé Centre"
+    ]
+  },
+  "Grand-Bassam": {
+    "Grand-Bassam": [
+      "Quartier France",
+      "Impérial",
+      "Moossou",
+      "Azuretti",
+      "Mondoukou",
+      "Centre-ville"
+    ]
+  },
+  "Assinie": {
+    "Assinie": [
+      "Assinie-Mafia",
+      "Assinie-France",
+      "Assouindé",
+      "Centre-ville"
+    ]
+  },
+  "Bonoua": {
+    "Bonoua": [
+      "Centre-ville"
+    ]
+  },
+  "Jacqueville": {
+    "Jacqueville": [
+      "Centre-ville"
+    ]
+  },
+  "Dabou": {
+    "Dabou": [
+      "Centre-ville"
+    ]
+  },
+  "Sikensi": {
+    "Sikensi": [
+      "Centre-ville"
+    ]
+  },
+  "Yamoussoukro": {
+    "Yamoussoukro": [
+      "Habitat",
+      "Morofé",
+      "Dioulabougou",
+      "N'Zuessy",
+      "Assabou",
+      "Kokrénou",
+      "220 Logements",
+      "Millionnaire",
+      "Centre-ville"
+    ]
+  },
+  "Fresco": {
+    "Fresco": [
+      "Centre-ville"
+    ]
+  },
+  "Sassandra": {
+    "Sassandra": [
+      "Centre-ville"
+    ]
+  },
+  "San-Pédro": {
+    "San-Pédro": [
+      "Bardot",
+      "Cité",
+      "Lac",
+      "Séwéké",
+      "Balmer",
+      "Centre-ville"
+    ]
+  },
+  "Bouaké": {
+    "Bouaké": [
+      "Commerce",
+      "Koko",
+      "Air France",
+      "Belleville",
+      "Dar-Es-Salam",
+      "Kennedy",
+      "Nimbo",
+      "Ahougnansou",
+      "Centre-ville"
     ]
   }
 };

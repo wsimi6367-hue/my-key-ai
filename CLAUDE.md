@@ -22,12 +22,15 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
     lecture brute de l'onglet Biens via l'API Sheets (compte Google de n8n, lecture seule ; la ligne d'en-têtes est retrouvée où qu'elle soit) →
     relecture des colonnes Téléphone/WhatsApp (W:X) en mode formule pour récupérer un numéro affiché « #ERROR! » (numéro tapé avec « + ») →
     catalogue des biens Disponibles trié du plus récent au plus ancien (date de publication, sinon d'enregistrement, sinon position ; 400 max) →
-    présélection (« Shrink Catalog ») : seulement les annonces du type / de la transaction demandés (message + 3 derniers messages du client), version courte, 120 max ; tout le catalogue si moins de 4 →
+    présélection (« Shrink Catalog », étape « le système trie ») : d'après le message + les 3 derniers messages du client, filtre par Ville,
+    Type de location / vente (longue durée, courte durée : nuit / week-end / séjour, vente) et type de bien ; s'il reste moins de 4 annonces,
+    on relâche un critère à la fois (la ville en dernier ; une ville hors Abidjan reste prioritaire dès qu'une annonce y correspond) ;
+    version courte, 120 max →
     agent IA (Gemini, modèle `gemini-3-flash-preview`) qui parcourt d'abord les annonces récentes puis remonte vers les plus anciennes, et renvoie `{ ids, reply }` → fiches complètes renvoyées à l'appli.
 - Relais Google Apps Script (`relais/Code.gs`, URL dans `CONFIG.relayUrl`) : l'appli l'appelle en premier (POST `text/plain`, sans pré-vérification CORS),
   il transmet à n8n ; si le relais est injoignable, l'appli appelle n8n directement. Raison : certains wifi bloquent l'adresse `*.app.n8n.cloud`.
   Le relais renvoie `{ error: "assistant", status }` si n8n répond en erreur, `{ error: "relais" }` s'il ne joint pas n8n.
-- Un `Bien` renvoyé : `id, demo, transaction, type, titre, commune, zone, quartier, repere, prix, periodicite, conditions,
+- Un `Bien` renvoyé : `id, demo, transaction, typeTx, type, categorie, standing, capacite, titre, ville, commune, zone, quartier, repere, prix, periodicite, conditions,
   surface, pieces, chambres, sdb, meuble, equipements, description, publie, contact{nom,typeAnnonceur,telephone,whatsapp,email},
   plateforme, url, image, autresImages`.
 - Mémoire : la conversation et le `sessionId` sont gardés dans `localStorage` (l'appli fonctionne aussi sans).
@@ -60,7 +63,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - `js/config.js` : adresse du chat n8n, délai, langue.
 - `js/api.js` : appel au chat (relais Google puis n8n direct) et messages d'erreur.
 - `js/app.js` : interface, navigation, chat, fiches de biens, choix du lieu, vocal, installation.
-- `js/geo.js` : référentiel Commune > Zone > Quartier (14 communes du District d'Abidjan). Doit rester identique à l'onglet « Quartiers » du Sheet.
+- `js/geo.js` : référentiel Commune > Zone > Quartier (14 communes du District d'Abidjan, puis les autres villes). Doit rester identique à l'onglet « Quartiers » du Sheet.
 - `js/search.js` : liste des lieux pour le sélecteur (`PLACES`, `norm`). Ses fonctions de recherche par règles ne sont plus utilisées par l'interface.
 - `js/icons.js` : icônes SVG.
 - `img/logo.png` : logo (maison + signature, fond transparent), utilisé comme masque CSS au-dessus du mot « my key ai » et dans l'écran d'ouverture.
@@ -76,7 +79,16 @@ Périodicité · Conditions (caution, avance…) · Surface (m²) · Pièces · 
 Équipements · Description · Publié par (nom) · Type d'annonceur · Téléphone · WhatsApp · Email ·
 Plateforme · URL de la publication · Date et heure de publication · Image principale (URL) ·
 Autres images (URL) · Disponibilité (Disponible|À vérifier|Réservé|Loué / vendu|Retiré) ·
-Dernière vérification · Notes
+Dernière vérification · Notes · Ville (AH) · Type de location / vente (AI : Location longue durée|Location courte durée|Vente) ·
+Catégorie (AJ : Habitation|Hébergement|Terrain|Commercial|Événementiel…) · Standing (AK : Économique|Standard|Haut standing|Luxe) ·
+Capacité (personnes) (AL)
+
+Colonnes AH–AL ajoutées le 24/11/2026 (sauvegarde avant changement : « SAUVEGARDE 24-11-2026 – les biens data base (avant restructuration) »).
+Listes déroulantes non strictes alimentées par l'onglet Listes (colonnes J–M). Si Ville ou Type de location / vente est vide,
+n8n le déduit (commune d'Abidjan → Abidjan ; Périodicité Journalier/Hebdomadaire → courte durée ; Transaction Vente → Vente).
+Onglet Quartiers : colonne E « Ville » ; autres villes (Grand-Bassam, Assinie, Bonoua, Jacqueville, Dabou, Sikensi, Yamoussoukro,
+Fresco, Sassandra, San-Pédro, Bouaké) en fin d'onglet, au format « Ville – Quartier » avec Commune = Zone = Ville.
+Une seule table pour tout (pas de fichiers séparés par ville ou par type) : le filtrage se fait dans n8n.
 
 « Localisation (choisir) » vaut `Commune – Zone – Quartier` (ou `Commune – Quartier` quand la commune n'a qu'une zone).
 Ne proposer au client que les lignes `Disponibilité = Disponible`.
