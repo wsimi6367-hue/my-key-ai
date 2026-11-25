@@ -1,6 +1,6 @@
 // Service worker de My Key AI : garde l'appli disponible (coquille hors ligne).
 // Le chat IA (requêtes POST vers n8n) n'est jamais mis en cache.
-const CACHE = "mykeyai-v17";
+const CACHE = "mykeyai-v18";
 const SHELL = [
   "./", "index.html", "manifest.webmanifest", "css/styles.css",
   "js/app.js", "js/api.js", "js/config.js", "js/geo.js", "js/icons.js", "js/search.js", "js/auth.js", "js/firebase-config.js",

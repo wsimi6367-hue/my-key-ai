@@ -27,6 +27,8 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
     on relâche un critère à la fois (la ville en dernier ; une ville hors Abidjan reste prioritaire dès qu'une annonce y correspond) ;
     version courte, 120 max →
     agent IA (Gemini, modèle `gemini-3-flash-preview`) qui parcourt d'abord les annonces récentes puis remonte vers les plus anciennes, et renvoie `{ ids, reply }` → fiches complètes renvoyées à l'appli.
+    Secours : si Gemini échoue (quota 429, panne), « Shape Reply » renvoie les 6 premières annonces de la présélection avec un message d'excuse (`source: "secours"`).
+    Lecture du Sheet limitée à 10 000 lignes (chat, veille, correcteur).
 - Relais Google Apps Script (`relais/Code.gs`, URL dans `CONFIG.relayUrl`) : l'appli l'appelle en premier (POST `text/plain`, sans pré-vérification CORS),
   il transmet à n8n ; si le relais est injoignable, l'appli appelle n8n directement. Raison : certains wifi bloquent l'adresse `*.app.n8n.cloud`.
   Le relais renvoie `{ error: "assistant", status }` si n8n répond en erreur, `{ error: "relais" }` s'il ne joint pas n8n.
@@ -66,7 +68,10 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
   - Corrige seulement : Commune / Zone / Ville d'après la Localisation (onglet Quartiers), Localisation ou valeur de menu mal écrite
     (accents, tirets, ancien format « Bingerville – Bingerville – … », 1 lettre d'écart et une seule possibilité), cases vides déductibles
     (Ville, Type de location / vente, Catégorie). Écrit en RAW, uniquement les cellules concernées. Le reste est renvoyé dans `aSignaler`.
-  - `{cells:[{range, old, new}]}` : correction précise d'une cellule, écrite seulement si sa valeur actuelle = `old`.
+  - Type de location / vente et Catégorie hors menu (ex. « Location », « Villa ») sont remplacés par la valeur déduite (Transaction / Périodicité, Type de bien).
+  - Une ligne dont la Disponibilité est invalide (signe d'un décalage de colonnes) n'est jamais corrigée automatiquement : elle est signalée.
+  - `{cells:[{range, old, new}], input:"RAW"|"USER_ENTERED"}` : correction précise de cellules (50 max par appel), écrite seulement si la valeur actuelle = `old`.
+    USER_ENTERED pour les dates / nombres (Sheet en fr_FR), RAW pour les téléphones (sinon le « + » devient une formule #ERROR!).
 - La veille l'appelle : essai à blanc → relecture → écriture → nouvel essai à blanc (doit donner 0). Jamais de suppression, ni prix,
   contact, disponibilité ou lieu deviné sans OKAY du propriétaire.
 
@@ -98,7 +103,7 @@ Colonnes AH–AL ajoutées le 24/11/2026 (sauvegarde avant changement : « SAUVE
 Listes déroulantes non strictes alimentées par l'onglet Listes (colonnes J–M). Si Ville ou Type de location / vente est vide,
 n8n le déduit (commune d'Abidjan → Abidjan ; Périodicité Journalier/Hebdomadaire → courte durée ; Transaction Vente → Vente).
 Onglet Quartiers : colonne E « Ville » ; autres villes (Grand-Bassam, Assinie, Bonoua, Jacqueville, Dabou, Sikensi, Yamoussoukro,
-Fresco, Sassandra, San-Pédro, Bouaké) en fin d'onglet, au format « Ville – Quartier » avec Commune = Zone = Ville.
+Fresco, Sassandra, San-Pédro, Bouaké, Korhogo) en fin d'onglet, au format « Ville – Quartier » avec Commune = Zone = Ville.
 Une seule table pour tout (pas de fichiers séparés par ville ou par type) : le filtrage se fait dans n8n.
 ATTENTION : Commune (H) et Zone (I) sont des valeurs écrites, PAS des formules : elles ne suivent pas la Localisation toute seule.
 Les valeurs doivent être écrites exactement comme dans les menus (onglet Listes). Ville : les 14 communes d'Abidjan (dont Bingerville) = « Abidjan ».

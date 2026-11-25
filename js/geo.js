@@ -369,5 +369,10 @@ export const GEO = {
       "Ahougnansou",
       "Centre-ville"
     ]
+  },
+  "Korhogo": {
+    "Korhogo": [
+      "Centre-ville"
+    ]
   }
 };
