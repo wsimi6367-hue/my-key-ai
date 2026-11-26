@@ -75,6 +75,18 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - La veille l'appelle : essai à blanc → relecture → écriture → nouvel essai à blanc (doit donner 0). Jamais de suppression, ni prix,
   contact, disponibilité ou lieu deviné sans OKAY du propriétaire.
 
+## Ajout des biens (point d'entrée unique)
+- Workflow n8n **« My Key AI – Ajouter un bien »** (id `UTldi921iLmNPQk2`), webhook `POST /webhook/mykey-ajouter-bien`, protégé par un jeton
+  (donné à l'IA de saisie, pas dans ce dépôt). Corps : `{ token, biens: [ { "<titre de colonne>": valeur, … } ], dryRun? }` (50 biens max).
+- Il refuse un bien sans titre, sans lien http, sans Transaction ou Type de bien valides, ou dont le lien existe déjà
+  (sauf `"doublonAutorise": true` pour une publication qui présente plusieurs biens).
+- Il normalise les menus (majuscules, alias « Standard », « Résidentiel »…), la Localisation (Commune / Zone / Ville d'après Quartiers),
+  les nombres (« 350 000 », « 13M »), les dates (ISO ou jj/mm/aaaa), protège les téléphones (« ' » devant « + »), donne l'ID (plus grand + 1)
+  et ajoute TOUJOURS après la dernière ligne remplie (append INSERT_ROWS, USER_ENTERED) : il ne peut pas écraser une ligne.
+- Réponse : `{ ecrit, lignes, ajoutes:[{id,titre}], refuses:[{raison}], avertissements }`.
+- Incident du 25/11/2026 : l'IA de saisie, qui écrivait directement, a écrasé les lignes 2 à 22 ; restauration le 26/11 depuis une copie
+  (biens d'origine remis en place, biens écrasants recopiés en fin de tableau, ID BIEN-1233 à 1253).
+
 ## Fichiers
 - `js/config.js` : adresse du chat n8n, délai, langue.
 - `js/api.js` : appel au chat (relais Google puis n8n direct) et messages d'erreur.
