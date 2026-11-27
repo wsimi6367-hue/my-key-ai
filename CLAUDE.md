@@ -86,6 +86,17 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - Réponse : `{ ecrit, lignes, ajoutes:[{id,titre}], refuses:[{raison}], avertissements }`.
 - Incident du 25/11/2026 : l'IA de saisie, qui écrivait directement, a écrasé les lignes 2 à 22 ; restauration le 26/11 depuis une copie
   (biens d'origine remis en place, biens écrasants recopiés en fin de tableau, ID BIEN-1233 à 1253).
+  Nouveaux écrasements le 26/11 15h20 et le 27/11 9h20 (lignes 2 à 16) ; réparés le 27/11 au soir (BIEN-1610…1624 recopiés en BIEN-1713…1727).
+
+## Gardien anti-écrasement
+- Workflow n8n **« My Key AI – Gardien »** (id `8jAkBKBfMlKhBQyw`), actif depuis le 27/11/2026 (accord du propriétaire) :
+  toutes les 30 minutes, plus webhook `POST /webhook/mykey-gardien` protégé par un jeton (`{token, dryRun?}`, jeton hors dépôt).
+- Il compare l'onglet Biens à la copie de référence « My Key AI – Gardien (copie de référence, ne pas modifier) »
+  (ID `1-ktuFROd2SfG_BbY-zgMxr9TdagsEylyQMzv4sJNxH4`, partagée avec le compte n8n). Écrasement = même ligne, autre ID et autre
+  titre + URL, et l'ancien bien n'existe plus nulle part. Alors : le bien écrasant est recopié en fin de tableau avec un nouvel ID,
+  puis l'ancien est remis à sa place (seulement si la ligne n'a pas changé entre-temps). Plus de 60 lignes touchées → il ne fait rien et signale.
+- Jamais de suppression. Une insertion ou un simple déplacement de lignes n'est pas un écrasement. Après chaque passage, la copie de
+  référence est réécrite ; un onglet « Journal » de la copie garde chaque réparation.
 
 ## Fichiers
 - `js/config.js` : adresse du chat n8n, délai, langue.
