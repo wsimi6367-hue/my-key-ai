@@ -21,13 +21,18 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
   - Étapes : contrôle du message (limite 80 messages / session / jour, 3000 / jour au total) →
     lecture brute de l'onglet Biens via l'API Sheets (compte Google de n8n, lecture seule ; la ligne d'en-têtes est retrouvée où qu'elle soit) →
     relecture des colonnes Téléphone/WhatsApp (W:X) en mode formule pour récupérer un numéro affiché « #ERROR! » (numéro tapé avec « + ») →
-    catalogue des biens Disponibles trié du plus récent au plus ancien (date de publication, sinon d'enregistrement, sinon position ; 1500 max) →
-    présélection (« Shrink Catalog », étape « le système trie ») : d'après le message + les 3 derniers messages du client, filtre par Ville,
-    Type de location / vente (longue durée, courte durée : nuit / week-end / séjour, vente) et type de bien ; s'il reste moins de 4 annonces,
-    on relâche un critère à la fois (la ville en dernier ; une ville hors Abidjan reste prioritaire dès qu'une annonce y correspond) ;
-    version courte, 120 max →
-    agent IA (Gemini, modèle `gemini-3-flash-preview`) qui parcourt d'abord les annonces récentes puis remonte vers les plus anciennes, et renvoie `{ ids, reply }` → fiches complètes renvoyées à l'appli.
-    Secours : si Gemini échoue (quota 429, panne), « Shape Reply » renvoie les 6 premières annonces de la présélection avec un message d'excuse (`source: "secours"`).
+    catalogue des biens Disponibles trié du plus récent au plus ancien (date de publication, sinon d'enregistrement, sinon position ; 10 000 max) →
+    recherche par le système (« Shrink Catalog ») dans TOUTES les annonces, d'après le message (+ les 3 derniers messages du client pour ce qui manque) :
+    ville, commune / zone / quartier (vocabulaire tiré des annonces), type de bien, location longue durée / courte durée / vente
+    (un budget sans précision = loyer au mois, ou achat s'il dépasse 5 M ; une annonce à la nuit n'est jamais proposée pour un loyer mensuel),
+    budget (« 60000F », « 60 000 », « 60k », « 60 mille », « 13M », « entre … et … », « au moins … »), pièces, chambres, meublé / vide,
+    nombre de biens demandé (« 10 studios » ; 6 par défaut, 12 max). Chaque annonce reçoit une étiquette : ★ CORRESPOND (tout respecté),
+    ★ correspond mais prix ou détails à confirmer, lieu voisin, budget dépassé de 15 % au plus, approchant. « encore » / « d'autres » :
+    les annonces déjà montrées dans la conversation sont écartées. 120 lignes max envoyées à l'IA →
+    agent IA (Gemini, modèle `gemini-3-flash-preview`) qui propose d'abord les ★ CORRESPOND jusqu'au nombre demandé, et renvoie `{ ids, reply }` →
+    « Shape Reply » : garantie que les ★ CORRESPOND passent en premier jusqu'au nombre demandé (sinon il complète la liste et réécrit le message) →
+    fiches complètes renvoyées à l'appli.
+    Secours : si Gemini échoue (quota 429, panne), « Shape Reply » renvoie les meilleures annonces trouvées par le système avec un message d'excuse (`source: "secours"`).
     Lecture du Sheet limitée à 10 000 lignes (chat, veille, correcteur).
 - Relais Google Apps Script (`relais/Code.gs`, URL dans `CONFIG.relayUrl`) : l'appli l'appelle en premier (POST `text/plain`, sans pré-vérification CORS),
   il transmet à n8n ; si le relais est injoignable, l'appli appelle n8n directement. Raison : certains wifi bloquent l'adresse `*.app.n8n.cloud`.
@@ -140,7 +145,7 @@ Ne proposer au client que les lignes `Disponibilité = Disponible`.
 2. **Canal WhatsApp** : WhatsApp Business Cloud API dans n8n, branché sur le même workflow.
 3. Script Apps Script dans le Sheet pour remplir automatiquement ID et date d'enregistrement.
 4. Recherche par photo (bouton appareil photo) : non implémentée, affiche un message.
-5. Présélection par type déjà en place ; si la base dépasse plusieurs centaines de biens d'un même type, filtrer aussi par commune et budget.
+5. Recherche par lieu, budget, pièces et meublé en place (27/11/2026) ; au-delà de quelques milliers de biens, passer à une vraie base (Firestore) remplie depuis le Sheet.
 
 ## Conventions
 - Interface en français, tutoiement interdit (vouvoiement).
