@@ -25,9 +25,11 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
     recherche par le système (« Shrink Catalog ») dans TOUTES les annonces, d'après le message (+ les 3 derniers messages du client pour ce qui manque) :
     ville, commune / zone / quartier (vocabulaire tiré des annonces), type de bien, location longue durée / courte durée / vente
     (un budget sans précision = loyer au mois, ou achat s'il dépasse 5 M ; une annonce à la nuit n'est jamais proposée pour un loyer mensuel),
-    budget (« 60000F », « 60 000 », « 60k », « 60 mille », « 13M », « entre … et … », « au moins … »), pièces, chambres, meublé / vide,
+    budget (« 60000F », « 60 000 », « 60k », « 60 mille », « 13M », « entre … et … », « au moins … »), pièces, chambres,
+    meublé : les biens meublés ne sont proposés QUE si le client dit « meublé » (jamais mélangés aux locations classiques, demande du propriétaire),
     nombre de biens demandé (« 10 studios » ; 6 par défaut, 12 max). Chaque annonce reçoit une étiquette : ★ CORRESPOND (tout respecté),
-    ★ correspond mais prix ou détails à confirmer, lieu voisin, budget dépassé de 15 % au plus, approchant. « encore » / « d'autres » :
+    ★ correspond mais prix ou détails à confirmer, lieu voisin, budget dépassé de 15 % au plus, approchant,
+    commune voisine dans le budget (Bingerville ↔ Cocody, Yopougon ↔ Songon / Attécoubé…), même lieu mais jusqu'à 50 % plus cher. « encore » / « d'autres » :
     les annonces déjà montrées dans la conversation sont écartées. 120 lignes max envoyées à l'IA →
     agent IA (Gemini, modèle `gemini-3-flash-preview`) qui propose d'abord les ★ CORRESPOND jusqu'au nombre demandé, et renvoie `{ ids, reply }` →
     « Shape Reply » : garantie que les ★ CORRESPOND passent en premier jusqu'au nombre demandé (sinon il complète la liste et réécrit le message) →
