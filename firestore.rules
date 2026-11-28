@@ -3,8 +3,8 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Chaque utilisateur ne peut lire et modifier que sa propre fiche.
     match /users/{uid} {
-      allow read, create, update: if request.auth != null && request.auth.uid == uid;
-      allow delete: if false;
+      // Suppression permise au titulaire (bouton « Supprimer mon compte »).
+      allow read, create, update, delete: if request.auth != null && request.auth.uid == uid;
 
       // Ses conversations : lecture, écriture et suppression par lui seul.
       match /conversations/{convId} {

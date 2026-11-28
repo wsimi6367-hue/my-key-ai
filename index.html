@@ -145,7 +145,20 @@
       <label>Confirmez le mot de passe<input name="password2" type="password" autocomplete="new-password" minlength="6" required></label>
       <p class="auth-msg" role="alert"></p>
       <button class="primary" type="submit">Créer mon compte</button>
-      <p class="note">Vos informations restent privées et servent uniquement à votre compte My Key AI.</p>
+      <p class="note">Vos informations restent privées et servent uniquement à votre compte My Key AI. Voir notre <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>.</p>
+    </form>
+  </div>
+
+  <!-- Suppression du compte -->
+  <div class="sheet account-sheet" id="delete-sheet" role="dialog" aria-label="Supprimer mon compte">
+    <div class="grab"></div>
+    <h2>Supprimer mon compte</h2>
+    <form id="delete-form" class="auth-form" novalidate>
+      <p class="warn">Votre compte, votre fiche (prénom, nom, commune) et toutes vos conversations enregistrées seront effacés définitivement. Cette action ne peut pas être annulée.</p>
+      <label>Mot de passe, pour confirmer<input name="password" type="password" autocomplete="current-password" required></label>
+      <p class="auth-msg" role="alert"></p>
+      <button class="danger" type="submit">Supprimer définitivement</button>
+      <button class="link" type="button" data-action="close-delete">Annuler</button>
     </form>
   </div>
 
@@ -163,6 +176,7 @@
     <a href="#assistant" data-action="reset"><span data-icon="plus"></span>Nouvelle conversation</a>
     <button class="theme-btn" data-action="theme" id="theme-btn"><span data-icon="sun"></span><span class="label">Mode clair (fond blanc)</span></button>
     <button class="install-btn hidden" data-action="install"><span data-icon="download"></span>Installer l'application</button>
+    <a href="confidentialite.html" target="_blank" rel="noopener"><span data-icon="lock"></span>Confidentialité</a>
     <div class="meta">Les biens viennent de notre base d'annonces, vérifiées par nos agents à Abidjan. Contactez toujours l'annonceur avant de vous déplacer et ne versez jamais d'argent avant la visite.</div>
   </nav>
 </main>

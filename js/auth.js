@@ -50,6 +50,7 @@ const ERR = {
   "auth/too-many-requests": "Trop d'essais. Patientez quelques minutes puis réessayez.",
   "auth/network-request-failed": "Pas de connexion internet. Réessayez.",
   "auth/invalid-email": "Identifiant invalide.",
+  "auth/requires-recent-login": "Pour votre sécurité, déconnectez-vous puis reconnectez-vous, et recommencez.",
 };
 const wrap = (e) => (e.userMessage ? e : fail(ERR[e.code] || "Une erreur est survenue. Réessayez."));
 
@@ -147,4 +148,22 @@ export async function getConversation(uid, convId) {
 export async function deleteConversation(uid, convId) {
   const { db, F } = await load();
   await F.deleteDoc(F.doc(db, "users", uid, "conversations", convId));
+}
+
+// Suppression définitive du compte (exigée par Google Play et l'App Store) :
+// on redemande le mot de passe, on efface les conversations, la fiche, puis le compte lui-même.
+export async function deleteAccount(password) {
+  if (!String(password || "")) throw fail("Indiquez votre mot de passe pour confirmer.");
+  try {
+    const { auth, db, A, F } = await load();
+    const user = auth.currentUser;
+    if (!user) throw fail("Vous n'êtes plus connecté. Reconnectez-vous puis recommencez.");
+    await A.reauthenticateWithCredential(user, A.EmailAuthProvider.credential(user.email, password));
+    const convs = await F.getDocs(F.collection(db, "users", user.uid, "conversations"));
+    await Promise.all(convs.docs.map((d) => F.deleteDoc(d.ref)));
+    const ref = F.doc(db, "users", user.uid);
+    // Si les anciennes règles Firestore interdisent encore la suppression, on vide la fiche.
+    try { await F.deleteDoc(ref); } catch { await F.setDoc(ref, { supprime: true, updatedAt: F.serverTimestamp() }); }
+    await A.deleteUser(user);
+  } catch (e) { throw wrap(e); }
 }

@@ -3,7 +3,7 @@ import { GEO } from "./geo.js";
 import { ICONS, TYPE_ICON } from "./icons.js";
 import { PLACES, norm } from "./search.js";
 import { askAssistant, newSessionId } from "./api.js";
-import { authEnabled, watchUser, signUp, signIn, signOutUser, resetPassword, saveConversation, listConversations, getConversation, deleteConversation } from "./auth.js";
+import { authEnabled, watchUser, signUp, signIn, signOutUser, resetPassword, saveConversation, listConversations, getConversation, deleteConversation, deleteAccount } from "./auth.js";
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -81,6 +81,7 @@ function closeAll() {
   $("#place-sheet").classList.remove("show");
   $("#drawer").classList.remove("show");
   $("#account-sheet")?.classList.remove("show");
+  $("#delete-sheet")?.classList.remove("show");
 }
 
 /* ---------- Lecture à voix haute ---------- */
@@ -463,7 +464,8 @@ function renderAccount() {
   if (u) {
     const ident = u.identifiant || "";
     box.innerHTML = `<div class="who">${esc([u.prenom, u.nom].filter(Boolean).join(" ") || "Mon compte")}<small>${esc(ident)}${u.commune ? " · " + esc(u.commune) : ""}</small></div>
-      <button class="link" data-action="logout">Se déconnecter</button>`;
+      <button class="link" data-action="logout">Se déconnecter</button>
+      <button class="link danger-link" data-action="delete-account">Supprimer mon compte</button>`;
   } else {
     box.innerHTML = `<div class="who">Votre compte<small>Retrouvez vos recherches sur tous vos appareils.</small></div>
       <button class="primary" data-action="account">Se connecter / Créer un compte</button>`;
@@ -476,6 +478,14 @@ function openAccount(tab = "login") {
   $("#overlay").classList.add("show");
   $("#account-sheet").classList.add("show");
   setAuthTab(tab);
+}
+function openDelete() {
+  closeAll();
+  const f = $("#delete-form");
+  f.reset(); f.querySelector(".auth-msg").textContent = "";
+  $("#overlay").classList.add("show");
+  $("#delete-sheet").classList.add("show");
+  setTimeout(() => f.password.focus(), 250);
 }
 function setAuthTab(tab) {
   $$("[data-auth-tab]").forEach((b) => b.classList.toggle("on", b.dataset.authTab === tab));
@@ -661,6 +671,8 @@ document.addEventListener("click", (e) => {
     case "theme": toggleTheme(); break;
     case "account": openAccount("login"); break;
     case "logout": signOutUser().then(() => onUser(null)); break;
+    case "delete-account": openDelete(); break;
+    case "close-delete": closeAll(); break;
     case "forgot": {
       const f = $("#login-form"), m = f.querySelector(".auth-msg");
       resetPassword(f.identifiant.value)
@@ -674,6 +686,21 @@ document.addEventListener("click", (e) => {
 });
 $("#overlay").addEventListener("click", () => { $("#install-help").classList.remove("show"); closeAll(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") { $("#install-help").classList.remove("show"); closeAll(); } });
+$("#delete-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const f = e.target, m = f.querySelector(".auth-msg"), b = f.querySelector("button[type=submit]");
+  if (!confirm("Supprimer définitivement votre compte My Key AI et toutes vos conversations ?")) return;
+  b.disabled = true; b.textContent = "Suppression en cours…"; m.textContent = "";
+  try {
+    await deleteAccount(f.password.value);
+    closeAll();
+    onUser(null); // efface aussi la discussion de l'appareil
+    store.clear();
+    toast("Votre compte a été supprimé.");
+  } catch (err) {
+    m.textContent = err.userMessage || "La suppression n'a pas abouti. Réessayez.";
+  } finally { b.disabled = false; b.textContent = "Supprimer définitivement"; }
+});
 $("#composer").addEventListener("submit", (e) => {
   e.preventDefault();
   const v = $("#chat-input").value.trim();

@@ -24,6 +24,7 @@ export const ICONS = {
   moon: s('<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>'),
   trash: s('<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>'),
   download: s('<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'),
+  lock: s('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'),
 };
 
 export const TYPE_ICON = {

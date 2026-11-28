@@ -60,7 +60,10 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
   - Conversations : `users/{uid}/conversations/{convId}` = `{ title, updatedAt (ms), count, messages (JSON des 40 derniers) }`.
     Menu ☰ > « Mes conversations » (compte connecté) : rouvrir, supprimer ; « Nouvelle conversation » en crée une nouvelle.
     À la déconnexion, la discussion en cours est effacée de l'appareil.
-  - Règles de sécurité : `firestore.rules` (chacun ne lit et n'écrit que sa fiche).
+  - Règles de sécurité : `firestore.rules` (chacun ne lit, n'écrit et ne supprime que sa fiche et ses conversations).
+  - « Supprimer mon compte » (menu ☰, compte connecté ; exigé par Google Play / App Store) : `deleteAccount(password)` dans `js/auth.js`
+    redemande le mot de passe, efface les conversations, la fiche `users/{uid}` (si les règles publiées l'interdisent encore, la fiche est vidée),
+    puis le compte Firebase ; l'appareil est ensuite vidé.
   - L'appli envoie `profile: { prenom, commune }` au chat n8n ; l'IA cherche d'abord dans cette commune si la demande ne précise pas de lieu.
 - Thème clair / sombre : bouton dans le menu, choix gardé dans `localStorage` (`mykeyai.theme`), attribut `data-theme="light"` sur `<html>` ; couleurs claires en fin de `css/styles.css`. Le logo est un masque CSS (`.logo-mark`) coloré par `--logo-color`.
 - Écran d'ouverture animé (`#splash` dans `index.html`, styles en fin de `css/styles.css`) : vert vif #00ff00 + logo blanc, puis blanc + logo vert #009a44, slogan « Une solution en 1 clic ! », cercle de chargement qui tourne ; environ 4,5 s (minimum 4 s demandé), puis fondu vers l'appli (un clic le passe).
@@ -119,6 +122,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - `js/geo.js` : référentiel Commune > Zone > Quartier (14 communes du District d'Abidjan, puis les autres villes). Doit rester identique à l'onglet « Quartiers » du Sheet.
 - `js/search.js` : liste des lieux pour le sélecteur (`PLACES`, `norm`). Ses fonctions de recherche par règles ne sont plus utilisées par l'interface.
 - `js/icons.js` : icônes SVG.
+- `confidentialite.html` : politique de confidentialité (lien dans le menu et sous le formulaire d'inscription ; à donner à Google Play / App Store).
 - `img/logo.png` : logo (maison + signature, fond transparent), utilisé comme masque CSS au-dessus du mot « my key ai » et dans l'écran d'ouverture.
 
 ## La base Google Sheet

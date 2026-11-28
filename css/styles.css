@@ -343,3 +343,12 @@ a { color: inherit; }
 .conv-del:hover { color: #ff8a7a; }
 .conv-del svg { width: 16px; height: 16px; }
 .conv-empty { color: var(--muted); font-size: 13px; padding: 8px 10px; }
+
+/* Suppression du compte */
+#delete-sheet h2 { justify-content: center; }
+.auth-form .warn { margin: 0; font-size: 14px; line-height: 1.5; color: var(--text); background: rgba(255, 90, 70, .08); border: 1px solid rgba(255, 90, 70, .35); border-radius: 12px; padding: 12px; }
+button.danger { width: 100%; padding: 14px; border-radius: 14px; background: #e5483b; color: #fff; font-weight: 600; font-size: 15px; }
+button.danger:disabled { opacity: .7; }
+.account-box .danger-link { color: #ff8a7a; }
+:root[data-theme="light"] .account-box .danger-link { color: #c0392b; }
+.note a { color: var(--green); }
