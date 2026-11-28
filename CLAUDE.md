@@ -78,6 +78,8 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
     (accents, tirets, ancien format « Bingerville – Bingerville – … », 1 lettre d'écart et une seule possibilité), cases vides déductibles
     (Ville, Type de location / vente, Catégorie). Écrit en RAW, uniquement les cellules concernées. Le reste est renvoyé dans `aSignaler`.
   - Type de location / vente et Catégorie hors menu (ex. « Location », « Villa ») sont remplacés par la valeur déduite (Transaction / Périodicité, Type de bien).
+  - Type de bien (accord « OKAY type de bien », 28/11/2026) : « boutique », « local commercial », « magasin » → « Magasin / local commercial » ;
+    « Villa duplex », « Duplex villa » → « Duplex ». « Résidence », « Townhouse » restent signalés (pas de valeur sûre).
   - Une ligne dont la Disponibilité est invalide (signe d'un décalage de colonnes) n'est jamais corrigée automatiquement : elle est signalée.
   - `{cells:[{range, old, new}], input:"RAW"|"USER_ENTERED"}` : correction précise de cellules (50 max par appel), écrite seulement si la valeur actuelle = `old`.
     USER_ENTERED pour les dates / nombres (Sheet en fr_FR), RAW pour les téléphones (sinon le « + » devient une formule #ERROR!).
