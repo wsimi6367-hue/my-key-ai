@@ -26,8 +26,9 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
     ville, commune / zone / quartier (vocabulaire tiré des annonces), type de bien, location longue durée / courte durée / vente
     (un budget sans précision = loyer au mois, ou achat s'il dépasse 5 M ; une annonce à la nuit n'est jamais proposée pour un loyer mensuel),
     budget (« 60000F », « 60 000 », « 60k », « 60 mille », « 13M », « entre … et … », « au moins … »), pièces, chambres,
-    meublé : les biens meublés ne sont proposés QUE si le client dit « meublé » (jamais mélangés aux locations classiques, demande du propriétaire),
-    nombre de biens demandé (« 10 studios » ; 6 par défaut, 12 max). Chaque annonce reçoit une étiquette : ★ CORRESPOND (tout respecté),
+    meublé : les biens meublés ne sont proposés QUE si le client dit « meublé » ou demande une location à la nuit / au séjour (jamais mélangés aux locations au mois, demande du propriétaire),
+    fautes courantes comprises (« apartement », « 03 pièces »),
+    nombre de biens demandé (« 10 studios », « donne-moi 10 … » ; 6 par défaut, 12 max ; l'interface affiche toutes les fiches reçues). Chaque annonce reçoit une étiquette : ★ CORRESPOND (tout respecté),
     ★ correspond mais prix ou détails à confirmer, lieu voisin, budget dépassé de 15 % au plus, approchant,
     commune voisine dans le budget (Bingerville ↔ Cocody, Yopougon ↔ Songon / Attécoubé…), même lieu mais jusqu'à 50 % plus cher. « encore » / « d'autres » :
     les annonces déjà montrées dans la conversation sont écartées. 120 lignes max envoyées à l'IA →
