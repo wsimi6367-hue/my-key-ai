@@ -28,7 +28,10 @@ const state = {
   tts: false, busy: false,
 };
 const persist = () => {
-  store.write({ sessionId: state.sessionId, convId: state.convId, messages: state.messages.slice(-40) });
+  // Jusqu'à 50 fiches par réponse : on limite la taille gardée sur l'appareil (environ 3 Mo).
+  let msgs = state.messages.slice(-40);
+  while (msgs.length > 2 && JSON.stringify(msgs).length > 3000000) msgs = msgs.slice(2);
+  store.write({ sessionId: state.sessionId, convId: state.convId, messages: msgs });
   if (state.user && state.messages.length) {
     saveConversation(state.user.uid, state.convId, state.messages);
     // Mise à jour immédiate de la liste affichée dans le menu.
@@ -249,7 +252,11 @@ function renderHistory() {
 function historyForApi() {
   return state.messages.slice(-12).map((m) => ({
     role: m.role,
-    content: m.listings?.length ? `${m.content} [biens proposés : ${m.listings.map((b) => `${b.id} ${b.titre} ${fmtPrice(b)}`).join(" ; ")}]` : m.content,
+    // Les 8 premiers biens avec leur titre (contexte pour l'IA), puis les ID des suivants (pour « encore »).
+    content: m.listings?.length
+      ? `${m.content} [biens proposés : ${m.listings.slice(0, 8).map((b) => `${b.id} ${b.titre} ${fmtPrice(b)}`).join(" ; ")}`
+        + (m.listings.length > 8 ? ` ; et aussi : ${m.listings.slice(8).map((b) => b.id).join(", ")}` : "") + "]"
+      : m.content,
   }));
 }
 

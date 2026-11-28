@@ -109,7 +109,7 @@ export async function resetPassword(identifiant) {
 //   { title, updatedAt (ms), count, messages (JSON des 40 derniers messages) }
 const slim = (m) => {
   const o = { role: m.role, content: String(m.content || "").slice(0, 4000) };
-  if (Array.isArray(m.listings) && m.listings.length) o.listings = m.listings.slice(0, 6);
+  if (Array.isArray(m.listings) && m.listings.length) o.listings = m.listings.slice(0, 50);
   return o;
 };
 export function convTitle(messages) {

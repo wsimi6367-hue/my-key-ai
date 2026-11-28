@@ -32,11 +32,12 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
     meublé : les biens meublés ne sont proposés QUE si le client dit « meublé » ou demande une location à la nuit / au séjour (jamais mélangés aux locations au mois, demande du propriétaire),
     fautes courantes comprises (« apartement », « 03 pièces »),
     Type de bien écrit hors menu dans le Sheet reconnu (« boutique », « local commercial », « Villa duplex », « Immeuble »…),
-    nombre de biens demandé (« 10 studios », « donne-moi 10 … » ; 6 par défaut, 12 max ; l'interface affiche toutes les fiches reçues). Chaque annonce reçoit une étiquette : ★ CORRESPOND (tout respecté),
+    nombre de biens demandé (« 10 studios », « donne-moi 35 … », « tous les … » ; 6 par défaut, « encore » = 12, 50 max ; l'interface affiche toutes les fiches reçues ;
+    l'historique envoyé garde les titres des 8 premiers biens et les ID des suivants, 3000 caractères par message côté n8n). Chaque annonce reçoit une étiquette : ★ CORRESPOND (tout respecté),
     ★ correspond mais prix ou détails à confirmer, lieu voisin, budget dépassé de 15 % au plus, approchant,
     commune voisine dans le budget (Bingerville ↔ Cocody, Yopougon ↔ Songon / Attécoubé…), même lieu mais jusqu'à 50 % plus cher. « encore » / « d'autres » :
     les annonces déjà montrées dans la conversation sont écartées. 120 lignes max envoyées à l'IA →
-    agent IA (Gemini, modèle `gemini-3-flash-preview`) qui propose d'abord les ★ CORRESPOND jusqu'au nombre demandé, et renvoie `{ ids, reply }` →
+    agent IA (Gemini, modèle `gemini-3-flash-preview`) qui propose d'abord les ★ CORRESPOND jusqu'au nombre demandé (50 max), et renvoie `{ ids, reply }` →
     « Shape Reply » : garantie que les ★ CORRESPOND passent en premier jusqu'au nombre demandé (sinon il complète la liste et réécrit le message) →
     fiches complètes renvoyées à l'appli.
     Secours : si Gemini échoue (quota 429, panne), « Shape Reply » renvoie les meilleures annonces trouvées par le système avec un message d'excuse (`source: "secours"`).
@@ -57,7 +58,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
   - `js/auth.js` : inscription, connexion, déconnexion, mot de passe oublié (comptes e-mail), conversations du compte.
     Un numéro de téléphone est converti en adresse technique `225XXXXXXXXXX@tel.mykeyai.app`.
   - Fiche Firestore `users/{uid}` : `prenom, nom, commune, identifiant, type ("email"|"tel"), createdAt, updatedAt` (ancien champ `chat` repris une fois).
-  - Conversations : `users/{uid}/conversations/{convId}` = `{ title, updatedAt (ms), count, messages (JSON des 40 derniers) }`.
+  - Conversations : `users/{uid}/conversations/{convId}` = `{ title, updatedAt (ms), count, messages (JSON des 40 derniers, 50 fiches max par message, 700 ko max) }`.
     Menu ☰ > « Mes conversations » (compte connecté) : rouvrir, supprimer ; « Nouvelle conversation » en crée une nouvelle.
     À la déconnexion, la discussion en cours est effacée de l'appareil.
   - Règles de sécurité : `firestore.rules` (chacun ne lit, n'écrit et ne supprime que sa fiche et ses conversations).
