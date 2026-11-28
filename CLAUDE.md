@@ -28,6 +28,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
     budget (« 60000F », « 60 000 », « 60k », « 60 mille », « 13M », « entre … et … », « au moins … »), pièces, chambres,
     meublé : les biens meublés ne sont proposés QUE si le client dit « meublé » ou demande une location à la nuit / au séjour (jamais mélangés aux locations au mois, demande du propriétaire),
     fautes courantes comprises (« apartement », « 03 pièces »),
+    Type de bien écrit hors menu dans le Sheet reconnu (« boutique », « local commercial », « Villa duplex », « Immeuble »…),
     nombre de biens demandé (« 10 studios », « donne-moi 10 … » ; 6 par défaut, 12 max ; l'interface affiche toutes les fiches reçues). Chaque annonce reçoit une étiquette : ★ CORRESPOND (tout respecté),
     ★ correspond mais prix ou détails à confirmer, lieu voisin, budget dépassé de 15 % au plus, approchant,
     commune voisine dans le budget (Bingerville ↔ Cocody, Yopougon ↔ Songon / Attécoubé…), même lieu mais jusqu'à 50 % plus cher. « encore » / « d'autres » :
