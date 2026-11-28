@@ -13,6 +13,9 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 ## État actuel
 - `index.html` + `css/styles.css` + `js/*.js` : application web (PWA installable), sans framework ni build.
   Lancer avec un serveur statique : `python3 -m http.server 8000`, puis ouvrir http://localhost:8000.
+- Hébergement : GitHub Pages (`https://wsimi6367-hue.github.io/my-key-ai/`) et Cloudflare Pages, projet `my-key-ai`
+  (`https://my-key-ai.pages.dev`, compte Cloudflare du propriétaire, accès GitHub limité au seul dépôt my-key-ai) :
+  chaque push sur `main` est publié sur les deux, sans étape de build. Le vrai nom de domaine sera relié à ce projet Cloudflare.
 - 3 écrans, routés par le hash : `#assistant` (chat), `#recherche` (formulaire), `#vocal` (Web Speech API, fr-FR).
 - Le chat et la recherche passent par le workflow n8n **« My Key AI – Chat »** (id `iUXATrfSv4ckMzan`),
   webhook `POST https://appn8ncloud81.app.n8n.cloud/webhook/mykey-chat`.
@@ -50,7 +53,7 @@ Langue de l'interface et des réponses : français. Devise : FCFA (XOF).
 - Lecture à voix haute des réponses (speechSynthesis) via le bouton haut-parleur : voix française choisie, texte découpé en phrases, déblocage au premier toucher sur mobile, choix gardé dans `localStorage` (`mykeyai.tts`), message de confirmation (`#toast`).
 - Comptes utilisateurs (facultatifs) : Firebase Authentication (e-mail ou téléphone + mot de passe) et Firestore.
   - `js/firebase-config.js` : objet `firebaseConfig` du projet Firebase **`my-key-ai`** (forfait Spark gratuit ; connexion e-mail/mot de passe activée ;
-    domaine autorisé `wsimi6367-hue.github.io` ; Firestore édition Standard, règles de `firestore.rules` publiées). Si `null`, l'appli marche sans comptes.
+    domaines autorisés `wsimi6367-hue.github.io` et `my-key-ai.pages.dev` ; Firestore édition Standard, règles de `firestore.rules` publiées). Si `null`, l'appli marche sans comptes.
   - `js/auth.js` : inscription, connexion, déconnexion, mot de passe oublié (comptes e-mail), conversations du compte.
     Un numéro de téléphone est converti en adresse technique `225XXXXXXXXXX@tel.mykeyai.app`.
   - Fiche Firestore `users/{uid}` : `prenom, nom, commune, identifiant, type ("email"|"tel"), createdAt, updatedAt` (ancien champ `chat` repris une fois).
